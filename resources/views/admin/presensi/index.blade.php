@@ -29,9 +29,29 @@
     .aksi-btn.danger:hover { background: #dc2626; }
     .aksi-btn i { font-size: 1.15rem; }
     .table td, .table th { vertical-align: middle !important; }
+    
+    /* Warna teks yang lebih lembut */
+    .page-title {
+        color: #7C3AED !important; /* Ungu untuk judul */
+        font-weight: 700;
+    }
+    .table th {
+        color: #3B82F6 !important; /* Biru untuk header tabel */
+        font-weight: 600;
+    }
+    .table td {
+        color: #4B5563 !important; /* Abu-abu medium untuk isi tabel */
+    }
+    .form-label {
+        color: #7C3AED !important; /* Ungu untuk label */
+        font-weight: 500;
+    }
+    .form-control::placeholder {
+        color: #9CA3AF !important; /* Abu-abu untuk placeholder */
+    }
 </style>
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <h1 class="h3 mb-0">Data Presensi Siswa</h1>
+    <h1 class="h3 mb-0 page-title">Data Presensi Siswa</h1>
 </div>
 
 @if(session('success'))

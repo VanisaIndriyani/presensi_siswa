@@ -1,8 +1,26 @@
 @extends('layouts.admin')
 
 @section('content')
+<style>
+    /* Warna teks yang lebih lembut */
+    .page-title {
+        color: #7C3AED !important; /* Ungu untuk judul */
+        font-weight: 700;
+    }
+    .table th {
+        color: #3B82F6 !important; /* Biru untuk header tabel */
+        font-weight: 600;
+    }
+    .table td {
+        color: #4B5563 !important; /* Abu-abu medium untuk isi tabel */
+    }
+    .form-label {
+        color: #7C3AED !important; /* Ungu untuk label */
+        font-weight: 500;
+    }
+</style>
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <h1 class="h3 mb-0">Hari Libur & Pengaturan Jam Masuk</h1>
+    <h1 class="h3 mb-0 page-title">Hari Libur & Pengaturan Jam Masuk</h1>
     <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalTambah">+ Tambah Hari Libur</button>
 </div>
 

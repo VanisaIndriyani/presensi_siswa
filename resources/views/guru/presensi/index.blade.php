@@ -3,6 +3,35 @@
 @section('title', 'Presensi')
 
 @section('content')
+<style>
+    /* Warna teks yang konsisten */
+    .page-title {
+        color: #7C3AED !important; /* Ungu untuk judul */
+        font-weight: 700;
+    }
+    .table th {
+        color: #3B82F6 !important; /* Biru untuk header tabel */
+        font-weight: 600;
+    }
+    .table td {
+        color: #4B5563 !important; /* Abu-abu medium untuk isi tabel */
+    }
+    .form-label {
+        color: #7C3AED !important; /* Ungu untuk label */
+        font-weight: 500;
+    }
+    
+    /* Perbaikan tombol aksi */
+    .btn-show, .btn-edit, .btn-delete {
+        z-index: 10 !important;
+        pointer-events: auto !important;
+        position: relative !important;
+    }
+    .btn-show:hover, .btn-edit:hover, .btn-delete:hover {
+        transform: scale(1.1);
+        transition: transform 0.2s;
+    }
+</style>
 <div class="row">
     <!-- Filter -->
     <div class="col-12 mb-4">
@@ -39,7 +68,7 @@
     <div class="col-12">
         <div class="card">
             <div class="card-header d-flex flex-wrap justify-content-between align-items-center">
-                <h5 class="card-title mb-2 mb-md-0">
+                <h5 class="card-title mb-2 mb-md-0 page-title">
                     <i class="fas fa-clipboard-list me-2"></i>
                     Daftar Presensi - {{ \Carbon\Carbon::parse($tanggal)->translatedFormat('d F Y') }}
                 </h5>
