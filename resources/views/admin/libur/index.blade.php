@@ -28,6 +28,39 @@
     <div class="alert alert-success">{{ session('success') }}</div>
 @endif
 
+<!-- Pengaturan Jam Masuk -->
+<div class="card mb-4">
+    <div class="card-body">
+        <h5 class="mb-3" style="color: #3B82F6; font-weight: 600;">
+            <i class="fas fa-clock me-2"></i>Pengaturan Jam Masuk
+        </h5>
+        <form method="POST" action="{{ route('admin.libur.updateJamMasuk') }}">
+            @csrf
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="mb-3">
+                        <label class="form-label">Jam Mulai Masuk</label>
+                        <input type="time" name="start_time" class="form-control" value="{{ $jamMasuk->start_time ?? '07:00' }}" required>
+                        <small class="text-muted">Jam mulai siswa bisa presensi</small>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="mb-3">
+                        <label class="form-label">Jam Tutup Masuk</label>
+                        <input type="time" name="end_time" class="form-control" value="{{ $jamMasuk->end_time ?? '08:30' }}" required>
+                        <small class="text-muted">Batas waktu presensi tepat waktu</small>
+                    </div>
+                </div>
+                <div class="col-md-4 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-1"></i>Update Jam Masuk
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
 <div class="card">
     <div class="card-body">
         <h5 class="mb-3">Daftar Hari Libur</h5>

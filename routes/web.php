@@ -31,7 +31,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::resource('presensi', App\Http\Controllers\Admin\PresensiController::class);
     Route::resource('libur', App\Http\Controllers\Admin\LiburController::class);
     Route::resource('laporan', App\Http\Controllers\Admin\LaporanController::class)->only(['index']);
-    Route::put('libur/jam-masuk', [App\Http\Controllers\Admin\LiburController::class, 'updateJamMasuk'])->name('libur.updateJamMasuk');
+    Route::post('libur/jam-masuk', [App\Http\Controllers\Admin\LiburController::class, 'updateJamMasuk'])->name('libur.updateJamMasuk');
     Route::get('laporan/export-excel', [App\Http\Controllers\Admin\LaporanController::class, 'exportExcel'])->name('laporan.exportExcel');
     Route::get('laporan/export-pdf', [App\Http\Controllers\Admin\LaporanController::class, 'exportPdf'])->name('laporan.exportPdf');
     Route::get('presensi/api', [App\Http\Controllers\Admin\PresensiController::class, 'api'])->name('presensi.api');
