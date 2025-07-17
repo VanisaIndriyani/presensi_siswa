@@ -14,6 +14,9 @@
     @if($tanggal)
         <p><b>Tanggal:</b> {{ $tanggal }}</p>
     @endif
+    @if(!empty($kelas))
+        <p><b>Kelas:</b> {{ $kelas }}</p>
+    @endif
     <table>
         <thead>
             <tr>
@@ -24,6 +27,7 @@
                 <th>Waktu Scan</th>
                 <th>Status</th>
                 <th>Keterangan</th>
+                <th>Jam Pulang</th>
             </tr>
         </thead>
         <tbody>
@@ -47,6 +51,9 @@
                         @else
                             {{ $p->keterangan }}
                         @endif
+                    </td>
+                    <td>
+                        {{ $p->jam_pulang ? $p->jam_pulang : '-' }}
                     </td>
                 </tr>
             @empty

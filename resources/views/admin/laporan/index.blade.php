@@ -22,8 +22,8 @@
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h1 class="h3 mb-0 page-title">Laporan Presensi Siswa</h1>
     <div>
-        <a href="{{ route('admin.laporan.exportExcel', ['tanggal' => $tanggal]) }}" class="btn btn-success me-2">Download Excel</a>
-        <a href="{{ route('admin.laporan.exportPdf', ['tanggal' => $tanggal]) }}" class="btn btn-danger">Download PDF</a>
+        <a href="{{ route('admin.laporan.exportExcel', array_filter(['tanggal' => $tanggal, 'kelas' => request('kelas')])) }}" class="btn btn-success me-2">Download Excel</a>
+        <a href="{{ route('admin.laporan.exportPdf', array_filter(['tanggal' => $tanggal, 'kelas' => request('kelas')])) }}" class="btn btn-danger">Download PDF</a>
     </div>
 </div>
 
@@ -33,6 +33,15 @@
             <div class="col-auto">
                 <label class="form-label">Filter Tanggal</label>
                 <input type="date" name="tanggal" class="form-control" value="{{ $tanggal ?? '' }}">
+            </div>
+            <div class="col-auto">
+                <label class="form-label">Filter Kelas</label>
+                <select name="kelas" class="form-select">
+                    <option value="">Semua Kelas</option>
+                    @foreach($kelasList as $k)
+                        <option value="{{ $k }}" {{ request('kelas') == $k ? 'selected' : '' }}>{{ $k }}</option>
+                    @endforeach
+                </select>
             </div>
             <div class="col-auto">
                 <label class="form-label">Cari Nama/NISN</label>
@@ -57,9 +66,11 @@
                         <th>Nama Siswa</th>
                         <th>NISN</th>
                         <th>Kelas</th>
-                        <th>Waktu Scan</th>
+                        <th>Jam Masuk</th>
+                        <th>Jam Pulang</th>
                         <th>Status</th>
                         <th>Keterangan</th>
+                       
                     </tr>
                 </thead>
                 <tbody>
@@ -70,6 +81,9 @@
                             <td>{{ $p->siswa->nisn ?? '-' }}</td>
                             <td>{{ $p->siswa->kelas ?? '-' }}</td>
                             <td>{{ $p->waktu_scan }}</td>
+                            <td>
+                                {{ $p->jam_pulang ? $p->jam_pulang : '-' }}
+                            </td>
                             <td>
                                 @if($p->status == 'tepat_waktu')
                                     <span class="badge bg-success">Tepat Waktu</span>
@@ -90,6 +104,7 @@
                                     {{ $p->keterangan }}
                                 @endif
                             </td>
+                          
                         </tr>
                     @empty
                         <tr>

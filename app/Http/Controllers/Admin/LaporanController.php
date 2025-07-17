@@ -15,6 +15,8 @@ class LaporanController extends Controller
     {
         $tanggal = $request->input('tanggal');
         $search = $request->input('search');
+        $kelas = $request->input('kelas');
+        $kelasList = \App\Models\Siswa::select('kelas')->distinct()->orderBy('kelas')->pluck('kelas');
         $presensis = Presensi::with('siswa')
             ->when($tanggal, function($q) use ($tanggal) {
                 $q->whereDate('tanggal', $tanggal);
@@ -25,27 +27,39 @@ class LaporanController extends Controller
                        ->orWhere('nisn', 'like', "%$search%") ;
                 });
             })
+            ->when($kelas, function($q) use ($kelas) {
+                $q->whereHas('siswa', function($qs) use ($kelas) {
+                    $qs->where('kelas', $kelas);
+                });
+            })
             ->orderByDesc('waktu_scan')
             ->get();
-        return view('admin.laporan.index', compact('presensis', 'tanggal'));
+        return view('admin.laporan.index', compact('presensis', 'tanggal', 'kelas', 'kelasList'));
     }
 
     public function exportExcel(Request $request)
     {
         $tanggal = $request->input('tanggal');
-        return Excel::download(new PresensiExport($tanggal), 'laporan-presensi.xlsx');
+        $kelas = $request->input('kelas');
+        return Excel::download(new PresensiExport($tanggal, $kelas), 'laporan-presensi.xlsx');
     }
 
     public function exportPdf(Request $request)
     {
         $tanggal = $request->input('tanggal');
+        $kelas = $request->input('kelas');
         $presensis = Presensi::with('siswa')
             ->when($tanggal, function($q) use ($tanggal) {
                 $q->whereDate('tanggal', $tanggal);
             })
+            ->when($kelas, function($q) use ($kelas) {
+                $q->whereHas('siswa', function($qs) use ($kelas) {
+                    $qs->where('kelas', $kelas);
+                });
+            })
             ->orderByDesc('waktu_scan')
             ->get();
-        $pdf = PDF::loadView('admin.laporan.pdf', compact('presensis', 'tanggal'));
+        $pdf = PDF::loadView('admin.laporan.pdf', compact('presensis', 'tanggal', 'kelas'));
         return $pdf->download('laporan-presensi.pdf');
     }
 }
