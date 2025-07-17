@@ -136,7 +136,7 @@
                     <ul class="list-group list-group-flush mb-3">
                         <li class="list-group-item"><b>Nama Siswa:</b> <span id="edit-nama"></span></li>
                         <li class="list-group-item"><b>Tanggal:</b> <span id="edit-tanggal"></span></li>
-                        <li class="list-group-item"><b>Waktu Scan:</b> <span id="edit-waktu_scan"></span></li>
+                        <li class="list-group-item"><b>Jam Masuk:</b> <span id="edit-waktu_scan"></span></li>
                     </ul>
                     <div class="mb-3">
                         <label class="form-label">Status</label>

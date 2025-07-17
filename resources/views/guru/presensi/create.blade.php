@@ -61,7 +61,7 @@
                             
                             <div class="col-md-6">
                                 <div class="mb-3">
-                                    <label class="form-label">Waktu Scan <span class="text-danger">*</span></label>
+                                    <label class="form-label">Jam masuk <span class="text-danger">*</span></label>
                                     <input type="time" name="waktu_scan" value="{{ old('waktu_scan', '07:00') }}" 
                                            class="form-control @error('waktu_scan') is-invalid @enderror" required>
                                     @error('waktu_scan')

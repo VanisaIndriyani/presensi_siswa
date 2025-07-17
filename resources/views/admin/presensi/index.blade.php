@@ -85,7 +85,7 @@
                         <th>Nama Siswa</th>
                         <th>NISN</th>
                         <th>Kelas</th>
-                        <th>Waktu Scan</th>
+                        <th>jam masuk </th>
                         <th>Jam Pulang</th>
                         <th>Status</th>
                         <th>Keterangan</th>
