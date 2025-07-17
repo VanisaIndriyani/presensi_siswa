@@ -126,11 +126,23 @@
                                             </td>
                                             <td>
                                                 @if($presensi->keterangan)
-                                                    {{ $presensi->keterangan }}
+                                                    @if(str_contains($presensi->keterangan, 'Terlambat') && str_contains($presensi->keterangan, 'menit'))
+                                                        @php
+                                                            preg_match('/(\d+(?:\.\d+)?)/', $presensi->keterangan, $matches);
+                                                            $menit = isset($matches[1]) ? round($matches[1]) : 0;
+                                                        @endphp
+                                                        Terlambat {{ $menit }} menit
+                                                    @else
+                                                        {{ $presensi->keterangan }}
+                                                    @endif
                                                 @elseif($presensi->status === 'tepat_waktu')
-                                                    Tepat waktu masuk sekolah
+                                                    Tepat waktu
                                                 @elseif($presensi->status === 'terlambat')
-                                                    Terlambat tanpa keterangan
+                                                    Terlambat
+                                                @elseif($presensi->status === 'izin')
+                                                    Izin
+                                                @elseif($presensi->status === 'sakit')
+                                                    Sakit
                                                 @else
                                                     -
                                                 @endif
@@ -237,10 +249,11 @@
 
 @push('scripts')
 <script>
-document.querySelectorAll('.btn-show').forEach(btn => {
-    btn.addEventListener('click', function () {
-        const id = this.dataset.id;
-        fetch(`/guru/presensi/${id}`).then(res => res.json()).then(data => {
+document.addEventListener('click', function(e) {
+    if (e.target.closest('.btn-show')) {
+        const btn = e.target.closest('.btn-show');
+        const id = btn.dataset.id;
+        fetch(`{{ url('guru/presensi') }}/${id}`).then(res => res.json()).then(data => {
             document.getElementById('show-nama').textContent = data.siswa?.nama || '-';
             document.getElementById('show-nisn').textContent = data.siswa?.nisn || '-';
             document.getElementById('show-kelas').textContent = data.siswa?.kelas || '-';
@@ -250,32 +263,28 @@ document.querySelectorAll('.btn-show').forEach(btn => {
             document.getElementById('show-keterangan').textContent = data.keterangan || '-';
             new bootstrap.Modal(document.getElementById('modalShow')).show();
         });
-    });
-});
-
-document.querySelectorAll('.btn-edit').forEach(btn => {
-    btn.addEventListener('click', function () {
-        const id = this.dataset.id;
-        fetch(`/guru/presensi/${id}/edit`).then(res => res.json()).then(data => {
+    }
+    if (e.target.closest('.btn-edit')) {
+        const btn = e.target.closest('.btn-edit');
+        const id = btn.dataset.id;
+        fetch(`{{ url('guru/presensi') }}/${id}/edit`).then(res => res.json()).then(data => {
             document.getElementById('edit-nama').textContent = data.siswa?.nama || '-';
             document.getElementById('edit-tanggal').textContent = data.tanggal;
             document.getElementById('edit-waktu_scan').textContent = data.waktu_scan;
-            document.getElementById('formEdit').action = `/guru/presensi/${id}`;
+            document.getElementById('formEdit').action = `{{ url('guru/presensi') }}/${id}`;
             document.querySelector('select[name="status"]').value = data.status;
             document.querySelector('textarea[name="keterangan"]').value = data.keterangan || '';
             new bootstrap.Modal(document.getElementById('modalEdit')).show();
         });
-    });
-});
-
-document.querySelectorAll('.btn-delete').forEach(btn => {
-    btn.addEventListener('click', function () {
-        const id = this.dataset.id;
-        const nama = this.dataset.nama;
+    }
+    if (e.target.closest('.btn-delete')) {
+        const btn = e.target.closest('.btn-delete');
+        const id = btn.dataset.id;
+        const nama = btn.dataset.nama;
         document.getElementById('delete-nama').textContent = nama;
-        document.getElementById('formDelete').action = `/guru/presensi/${id}`;
+        document.getElementById('formDelete').action = `{{ url('guru/presensi') }}/${id}`;
         new bootstrap.Modal(document.getElementById('modalDelete')).show();
-    });
+    }
 });
 </script>
 @endpush

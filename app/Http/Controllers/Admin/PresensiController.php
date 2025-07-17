@@ -80,6 +80,7 @@ class PresensiController extends Controller
                 'nisn' => $p->siswa->nisn ?? '-',
                 'kelas' => $p->siswa->kelas ?? '-',
                 'waktu_scan' => $p->waktu_scan,
+                'jam_pulang' => $p->jam_pulang,
                 'status' => $p->status,
                 'keterangan' => $p->keterangan,
                 'id' => $p->id,
@@ -88,3 +89,4 @@ class PresensiController extends Controller
         return response()->json($data);
     }
 }
+

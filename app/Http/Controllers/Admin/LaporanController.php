@@ -14,9 +14,16 @@ class LaporanController extends Controller
     public function index(Request $request)
     {
         $tanggal = $request->input('tanggal');
+        $search = $request->input('search');
         $presensis = Presensi::with('siswa')
             ->when($tanggal, function($q) use ($tanggal) {
                 $q->whereDate('tanggal', $tanggal);
+            })
+            ->when($search, function($q) use ($search) {
+                $q->whereHas('siswa', function($qs) use ($search) {
+                    $qs->where('nama', 'like', "%$search%")
+                       ->orWhere('nisn', 'like', "%$search%") ;
+                });
             })
             ->orderByDesc('waktu_scan')
             ->get();

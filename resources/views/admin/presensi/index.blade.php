@@ -86,6 +86,7 @@
                         <th>NISN</th>
                         <th>Kelas</th>
                         <th>Waktu Scan</th>
+                        <th>Jam Pulang</th>
                         <th>Status</th>
                         <th>Keterangan</th>
                         <th class="text-center">Aksi</th>
@@ -99,6 +100,7 @@
                             <td>{{ $p->siswa->nisn ?? '-' }}</td>
                             <td>{{ $p->siswa->kelas ?? '-' }}</td>
                             <td>{{ $p->waktu_scan }}</td>
+                            <td>{{ $p->jam_pulang ? $p->jam_pulang : '-' }}</td>
                             <td>
                                 @if($p->status == 'tepat_waktu')
                                     <span class="badge bg-success">Tepat Waktu</span>
@@ -325,6 +327,7 @@ function fetchPresensi() {
                         <td>${p.nisn}</td>
                         <td>${p.kelas}</td>
                         <td>${p.waktu_scan}</td>
+                        <td>${p.jam_pulang ? p.jam_pulang : '-'}</td>
                         <td>${p.status === 'tepat_waktu' ? '<span class=\'badge bg-success\'>Tepat Waktu</span>' : (p.status === 'terlambat' ? '<span class=\'badge bg-danger\'>Terlambat</span>' : (p.status === 'sakit' ? '<span class=\'badge bg-warning text-dark\'>Sakit</span>' : (p.status === 'izin' ? '<span class=\'badge bg-info text-dark\'>Izin</span>' : '')))}</td>
                         <td>${(p.status === 'tepat_waktu' && (!p.keterangan || p.keterangan === '')) ? 'Tepat waktu masuk sekolah' : (p.keterangan ?? '')}</td>
                         <td class="text-center">

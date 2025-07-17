@@ -3,33 +3,28 @@
 namespace App\Http\Controllers\Guru;
 
 use App\Http\Controllers\Controller;
-use App\Models\Guru;
-use App\Models\Siswa;
 use App\Models\Presensi;
-use Illuminate\Http\Request;
-use Carbon\Carbon;
+use App\Models\Siswa;
 use App\Models\JamMasuk;
+use Illuminate\Http\Request;
 
 class PresensiController extends Controller
 {
     public function index(Request $request)
     {
+        $tanggal = $request->input('tanggal', now()->format('Y-m-d'));
         $kelasList = Siswa::select('kelas')->distinct()->orderBy('kelas')->pluck('kelas');
-        $tanggal = $request->input('tanggal', today()->format('Y-m-d'));
-        $kelas = $request->input('kelas');
-
-        $presensis = Presensi::with('siswa')
-            ->when($kelas, fn($q) => $q->whereHas('siswa', fn($q2) => $q2->where('kelas', $kelas)))
-            ->when($tanggal, fn($q) => $q->whereDate('tanggal', $tanggal))
-            ->orderByDesc('waktu_scan')
-            ->get();
-
-        return view('guru.presensi.index', [
-            'guru' => auth()->user(),
-            'presensis' => $presensis,
-            'tanggal' => $tanggal,
-            'kelasList' => $kelasList,
-        ]);
+        $query = Presensi::with('siswa')->orderByDesc('waktu_scan');
+        if ($request->kelas) {
+            $query->whereHas('siswa', function($q) use ($request) {
+                $q->where('kelas', $request->kelas);
+            });
+        }
+        if ($tanggal) {
+            $query->whereDate('tanggal', $tanggal);
+        }
+        $presensis = $query->get();
+        return view('guru.presensi.index', compact('presensis', 'tanggal', 'kelasList'));
     }
 
     public function create()
@@ -41,59 +36,26 @@ class PresensiController extends Controller
 
     public function store(Request $request)
     {
-        $jamMasuk = JamMasuk::first();
-        $endTime = $jamMasuk ? $jamMasuk->end_time : '08:30';
-        $isLibur = \App\Models\Libur::where('tanggal', today())->exists();
-
-        if ($isLibur) {
-            return redirect()->back()->with('error', 'Hari ini libur, presensi dinonaktifkan!');
-        }
-
         $validated = $request->validate([
             'siswa_id' => 'required|exists:siswas,id',
             'tanggal' => 'required|date',
-            'waktu_scan' => 'required|date_format:H:i',
+            'waktu_scan' => 'required',
             'status' => 'required|in:tepat_waktu,terlambat,izin,sakit',
-            'keterangan' => 'nullable|string|max:255',
+            'keterangan' => 'nullable|string',
         ]);
 
-        $siswa = Siswa::find($validated['siswa_id']);
-        $existingPresensi = Presensi::where('siswa_id', $siswa->id)
-            ->whereDate('tanggal', $validated['tanggal'])
-            ->first();
+        // Gabungkan tanggal dan waktu
+        $waktuScan = $validated['tanggal'] . ' ' . $validated['waktu_scan'];
 
-        $waktuScan = $validated['tanggal'] . ' ' . $validated['waktu_scan'] . ':00';
-        $jamTutup = Carbon::createFromFormat('H:i', $endTime);
-        $status = Carbon::createFromFormat('H:i', $validated['waktu_scan'])->lte($jamTutup)
-            ? $validated['status']
-            : 'terlambat';
+        Presensi::create([
+            'siswa_id' => $validated['siswa_id'],
+            'waktu_scan' => $waktuScan,
+            'status' => $validated['status'],
+            'tanggal' => $validated['tanggal'],
+            'keterangan' => $validated['keterangan'],
+        ]);
 
-        // Jika belum presensi masuk, lakukan presensi masuk
-        if (!$existingPresensi) {
-            Presensi::create([
-                'siswa_id' => $validated['siswa_id'],
-                'kelas' => $siswa->kelas,
-                'guru_id' => auth()->id(),
-                'tanggal' => $validated['tanggal'],
-                'waktu_scan' => $waktuScan,
-                'status' => $status,
-                'keterangan' => $validated['keterangan'],
-            ]);
-            return redirect()->route('guru.presensi.index')->with('success', 'Presensi masuk berhasil!');
-        } else {
-            // Sudah presensi masuk, cek apakah sudah presensi pulang
-            if ($existingPresensi->jam_pulang) {
-                return redirect()->route('guru.presensi.index')->with('error', 'Siswa sudah melakukan presensi pulang hari ini!');
-            }
-            // Hanya boleh presensi pulang setelah jam 14:00
-            if ($validated['waktu_scan'] < '14:00') {
-                return redirect()->route('guru.presensi.index')->with('error', 'Presensi pulang hanya bisa dilakukan setelah jam 14:00!');
-            }
-            $existingPresensi->update([
-                'jam_pulang' => $validated['tanggal'] . ' ' . $validated['waktu_scan'] . ':00',
-            ]);
-            return redirect()->route('guru.presensi.index')->with('success', 'Presensi pulang berhasil!');
-        }
+        return redirect()->route('guru.presensi.index')->with('success', 'Presensi berhasil ditambahkan!');
     }
 
     public function show(Presensi $presensi)
@@ -111,8 +73,8 @@ class PresensiController extends Controller
     public function update(Request $request, Presensi $presensi)
     {
         $validated = $request->validate([
-            'keterangan' => 'nullable|string|max:255',
             'status' => 'required|in:tepat_waktu,terlambat,izin,sakit',
+            'keterangan' => 'nullable|string',
         ]);
 
         $presensi->update($validated);
@@ -127,118 +89,116 @@ class PresensiController extends Controller
 
     public function scanQr(Request $request)
     {
-        \Log::info('SCAN QR REQUEST MASUK', [
-            'kelas' => $request->input('kelas'),
-            'qr' => $request->input('qr'),
-            'auth' => auth()->user() ? auth()->user()->email : null,
+        $request->validate([
+            'qr' => 'required|string',
+            'kelas' => 'required|string',
         ]);
 
-        $jamMasuk = JamMasuk::first();
-        $endTimeRaw = $jamMasuk ? $jamMasuk->end_time : '08:30';
-
-        try {
-            $carbonEnd = Carbon::parse($endTimeRaw);
-            $endTime = $carbonEnd->format('H:i');
-        } catch (\Exception $e) {
-            return response()->json(['success' => false, 'message' => 'Format jam masuk tidak valid. Hubungi admin.']);
-        }
-
-        $isLibur = \App\Models\Libur::where('tanggal', today())->exists();
-        if ($isLibur) {
-            return response()->json(['success' => false, 'message' => 'Hari ini libur, presensi dinonaktifkan!']);
-        }
-
-        $kelas = $request->input('kelas');
-        $qr = $request->input('qr');
-        $user = auth()->user();
-
-        if (!$user || !$kelas || !$qr) {
-            \Log::warning('DATA TIDAK LENGKAP SAAT SCAN QR', [
-                'user' => $user ? $user->email : null,
-                'kelas' => $kelas,
-                'qr' => $qr
-            ]);
-            return response()->json(['success' => false, 'message' => 'Data tidak lengkap']);
-        }
-
-        $siswa = Siswa::where('qr_code', $qr)->orWhere('nisn', $qr)->first();
-
+        // Cari siswa berdasarkan NISN (karena QR code berisi NISN)
+        $siswa = Siswa::where('nisn', $request->qr)->first();
+        
         if (!$siswa) {
-            return response()->json(['success' => false, 'message' => 'Siswa tidak ditemukan']);
+            return response()->json([
+                'success' => false,
+                'message' => 'QR Code tidak valid atau siswa tidak ditemukan!'
+            ]);
         }
 
-        if ($siswa->kelas !== $kelas) {
-            return response()->json(['success' => false, 'message' => 'Siswa tidak terdaftar di kelas ini']);
+        // Cek apakah siswa dari kelas yang dipilih
+        if ($siswa->kelas !== $request->kelas) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Siswa tidak termasuk dalam kelas yang dipilih!'
+            ]);
         }
 
-        $tanggal = now()->toDateString();
-
-        $existing = Presensi::where('siswa_id', $siswa->id)
-            ->whereDate('tanggal', $tanggal)
-            ->first();
-
-        if ($existing) {
-            return response()->json(['success' => false, 'message' => 'Siswa sudah presensi hari ini']);
+        $jamMasuk = JamMasuk::first();
+        $end = $jamMasuk ? $jamMasuk->end_time : '08:30';
+        $isLibur = \App\Models\Libur::where('tanggal', today())->exists();
+        
+        if ($isLibur) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Hari ini libur, presensi dinonaktifkan!'
+            ]);
         }
 
-        $waktuScan = now();
-        $jamTutup = Carbon::parse($endTime);
-        $status = $waktuScan->lte($jamTutup) ? 'tepat_waktu' : 'terlambat';
+        $now = now();
+        $today = $now->toDateString();
+        $presensi = Presensi::where('siswa_id', $siswa->id)->whereDate('tanggal', $today)->first();
 
-        $keterangan = null;
-        if ($status === 'terlambat') {
-            $selisihMenit = $jamTutup->diffInMinutes($waktuScan, false);
-            $keterangan = 'Terlambat ' . $selisihMenit . ' menit dari jam ' . $endTime;
-        }
-
-        try {
+        // Jika belum presensi masuk, lakukan presensi masuk
+        if (!$presensi) {
+            if ($now->format('H:i') > $end) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Presensi sudah ditutup!'
+                ]);
+            }
+            
+            $status = ($now->format('H:i') <= $end) ? 'tepat_waktu' : 'terlambat';
             Presensi::create([
                 'siswa_id' => $siswa->id,
-                'kelas' => $kelas,
-                'guru_id' => $user->id,
-                'tanggal' => $tanggal,
-                'waktu_scan' => $waktuScan,
+                'waktu_scan' => $now,
                 'status' => $status,
-                'keterangan' => $keterangan,
+                'tanggal' => $today,
+                'keterangan' => $status === 'terlambat' ? 'Terlambat masuk sekolah' : null,
             ]);
 
             return response()->json([
                 'success' => true,
                 'nama' => $siswa->nama,
-                'nisn' => $siswa->nisn,
-                'kelas' => $siswa->kelas,
-                'waktu_scan' => $waktuScan->format('H:i:s'),
+                'message' => 'Presensi masuk berhasil!'
             ]);
-        } catch (\Exception $e) {
+        } else {
+            // Sudah presensi masuk, cek apakah sudah presensi pulang
+            if ($presensi->jam_pulang) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Siswa sudah melakukan presensi pulang hari ini!'
+                ]);
+            }
+            
+            // Hanya boleh presensi pulang setelah jam 07:30
+            if ($now->format('H:i') < '07:30') {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Presensi pulang hanya bisa dilakukan setelah jam 07:30!'
+                ]);
+            }
+            
+            $presensi->update([
+                'jam_pulang' => $now,
+            ]);
+
             return response()->json([
-                'success' => false,
-                'message' => 'Gagal menyimpan presensi: ' . $e->getMessage(),
+                'success' => true,
+                'nama' => $siswa->nama,
+                'message' => 'Presensi pulang berhasil!'
             ]);
         }
     }
 
-    public function api(Request $request)
+    public function api()
     {
-        $tanggal = today()->format('Y-m-d');
-        $kelas = $request->input('kelas');
-
         $presensis = Presensi::with('siswa')
-            ->when($kelas, function ($q) use ($kelas) {
-                return $q->where('kelas', $kelas);
-            })
-            ->whereDate('tanggal', $tanggal)
+            ->whereDate('tanggal', today())
             ->orderByDesc('waktu_scan')
-            ->get()
-            ->map(function ($p) {
-                return [
-                    'nama' => $p->siswa->nama,
-                    'nisn' => $p->siswa->nisn,
-                    'kelas' => $p->kelas,
-                    'waktu_scan' => $p->waktu_scan,
-                ];
-            });
-            
-            
-        return response()->json($presensis);
+            ->get();
+
+        $data = $presensis->map(function($p, $i) {
+            return [
+                'no' => $i + 1,
+                'nama' => $p->siswa->nama ?? '-',
+                'nisn' => $p->siswa->nisn ?? '-',
+                'kelas' => $p->siswa->kelas ?? '-',
+                'waktu_scan' => $p->waktu_scan,
+                'jam_pulang' => $p->jam_pulang,
+                'status' => $p->status,
+                'keterangan' => $p->keterangan,
+            ];
+        });
+
+        return response()->json($data);
     }
-}
+} 

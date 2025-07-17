@@ -64,6 +64,24 @@
         </div>
     </div>
     <div class="col-12 col-sm-6 col-lg-3 mb-4">
+        <div class="card bg-secondary text-white text-center">
+            <div class="card-body">
+                <i class="fas fa-user-injured fa-2x mb-2"></i>
+                <h3 class="mb-1">{{ $statistik['sakit'] ?? 0 }}</h3>
+                <p class="mb-0">Sakit</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-sm-6 col-lg-3 mb-4">
+        <div class="card bg-info text-white text-center">
+            <div class="card-body">
+                <i class="fas fa-user-check fa-2x mb-2"></i>
+                <h3 class="mb-1">{{ $statistik['izin'] ?? 0 }}</h3>
+                <p class="mb-0">Izin</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-sm-6 col-lg-3 mb-4">
         <div class="card bg-info text-white text-center">
             <div class="card-body">
                 <i class="fas fa-percentage fa-2x mb-2"></i>

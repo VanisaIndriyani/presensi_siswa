@@ -35,6 +35,10 @@
                 <input type="date" name="tanggal" class="form-control" value="{{ $tanggal ?? '' }}">
             </div>
             <div class="col-auto">
+                <label class="form-label">Cari Nama/NISN</label>
+                <input type="text" name="search" class="form-control" value="{{ request('search') }}" placeholder="Nama atau NISN">
+            </div>
+            <div class="col-auto">
                 <button type="submit" class="btn btn-primary">Tampilkan</button>
                 <a href="{{ route('admin.laporan.index') }}" class="btn btn-secondary">Reset</a>
             </div>
@@ -69,8 +73,14 @@
                             <td>
                                 @if($p->status == 'tepat_waktu')
                                     <span class="badge bg-success">Tepat Waktu</span>
-                                @else
+                                @elseif($p->status == 'terlambat')
                                     <span class="badge bg-danger">Terlambat</span>
+                                @elseif($p->status == 'sakit')
+                                    <span class="badge bg-warning text-dark">Sakit</span>
+                                @elseif($p->status == 'izin')
+                                    <span class="badge bg-info text-dark">Izin</span>
+                                @else
+                                    <span class="badge bg-secondary">{{ ucfirst($p->status) }}</span>
                                 @endif
                             </td>
                             <td>

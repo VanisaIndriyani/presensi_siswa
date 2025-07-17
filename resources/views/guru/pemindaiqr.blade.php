@@ -3,6 +3,81 @@
 @section('content')
 @push('head')
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <style>
+        .qr-container {
+            max-width: 480px;
+            margin: 0 auto 32px auto;
+            background: #fff;
+            border-radius: 18px;
+            box-shadow: 0 6px 24px rgba(44,62,80,0.10);
+            padding: 32px 18px 24px 18px;
+            text-align: center;
+            transition: box-shadow 0.2s;
+        }
+        .qr-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 18px;
+            color: #2563eb;
+            letter-spacing: 1px;
+        }
+        #qr-reader {
+            margin: 0 auto 18px auto;
+            width: 100% !important;
+            max-width: 340px;
+            min-height: 220px;
+        }
+        @media (max-width: 600px) {
+            .qr-container {
+                padding: 18px 4px 12px 4px;
+            }
+            #qr-reader {
+                max-width: 98vw;
+                min-height: 160px;
+            }
+        }
+        .scan-result {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-top: 12px;
+            color: #059669;
+        }
+        .scan-error {
+            color: #dc2626;
+            font-size: 1rem;
+            margin-top: 10px;
+        }
+        .select-kelas {
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+        .loading-anim {
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            border: 3px solid #2563eb;
+            border-radius: 50%;
+            border-top: 3px solid #fff;
+            animation: spin 1s linear infinite;
+            margin-right: 8px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .table-responsive {
+            overflow-x: auto;
+        }
+        .table th, .table td {
+            vertical-align: middle !important;
+            font-size: 0.98rem;
+        }
+        .card-header.bg-light {
+            font-size: 1.1rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+    </style>
 @endpush
 @php
     $jamMasuk = \App\Models\JamMasuk::first();
@@ -17,50 +92,18 @@
         Presensi dinonaktifkan.
     </div>
 @endif
-<style>
-    .qr-container {
-        max-width: 420px;
-        margin: 0 auto 32px auto;
-        background: #fff;
-        border-radius: 12px;
-        box-shadow: 0 4px 16px rgba(44,62,80,0.08);
-        padding: 24px 18px 18px 18px;
-        text-align: center;
-    }
-    .qr-title {
-        font-size: 1.3rem;
-        font-weight: 700;
-        margin-bottom: 18px;
-        color: #2563eb;
-    }
-    #qr-reader {
-        margin: 0 auto 18px auto;
-    }
-    .scan-result {
-        font-size: 1.1rem;
-        font-weight: 600;
-        margin-top: 12px;
-        color: #059669;
-    }
-    .scan-error {
-        color: #dc2626;
-        font-size: 1rem;
-        margin-top: 10px;
-    }
-</style>
-
 <div class="qr-container" @if($isLibur) style="pointer-events:none;opacity:0.5;" @endif>
     <div class="qr-title">Pemindai QR Presensi Siswa</div>
     <div class="mb-3">
         <label for="selectKelas" class="form-label">Pilih Kelas</label>
-        <select id="selectKelas" class="form-select">
+        <select id="selectKelas" class="form-select select-kelas">
             <option value="">-- Pilih Kelas --</option>
             @foreach($kelasList as $kelas)
                 <option value="{{ $kelas }}">{{ $kelas }}</option>
             @endforeach
         </select>
     </div>
-    <div id="qr-reader" style="width:320px;"></div>
+    <div id="qr-reader"></div>
     <div id="scan-result" class="scan-result"></div>
     <div id="scan-error" class="scan-error"></div>
 </div>
@@ -77,29 +120,8 @@
     </div>
 </div>
 
-<div class="card shadow-sm mt-4">
-    <div class="card-header bg-light fw-bold">Daftar Siswa Sudah Presensi Hari Ini</div>
-    <div class="card-body p-0">
-        <div class="table-responsive">
-            <table class="table table-striped mb-0" id="tablePresensiGuru">
-                <thead class="table-light">
-                    <tr>
-                        <th>No</th>
-                        <th>Nama</th>
-                        <th>NISN</th>
-                        <th>Kelas</th>
-                        <th>Waktu Scan</th>
-                    </tr>
-                </thead>
-                <tbody id="tbodyPresensiGuru">
-                    <!-- Data akan diisi via AJAX -->
-                </tbody>
-            </table>
-        </div>
-    </div>
-</div>
 
-<!-- Script QR & AJAX -->
+
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
@@ -109,9 +131,14 @@ document.addEventListener('DOMContentLoaded', function() {
     let lastScanned = '';
     const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
-    function showResult(msg, isError = false) {
-        scanResult.textContent = isError ? '' : msg;
-        scanError.textContent = isError ? msg : '';
+    function showResult(msg, isError = false, isLoading = false) {
+        if(isLoading) {
+            scanResult.innerHTML = '<span class="loading-anim"></span> ' + msg;
+            scanError.textContent = '';
+        } else {
+            scanResult.textContent = isError ? '' : msg;
+            scanError.textContent = isError ? msg : '';
+        }
     }
 
     function showToast(message, isError = false) {
@@ -149,15 +176,13 @@ document.addEventListener('DOMContentLoaded', function() {
         if (decodedText === lastScanned) return;
 
         const selectedKelas = document.getElementById('selectKelas').value;
-        console.log("Decoded QR:", decodedText);
-        console.log("Kelas:", selectedKelas);
         if (!selectedKelas) {
             showResult('Pilih kelas terlebih dahulu', true);
             return;
         }
 
         lastScanned = decodedText;
-        showResult('Memproses presensi...');
+        showResult('Memproses presensi...', false, true);
 
         fetch('{{ url('guru/presensi/scan-qr') }}', {
             method: 'POST',
@@ -182,7 +207,6 @@ document.addEventListener('DOMContentLoaded', function() {
         .catch((err) => {
             showResult('Terjadi error saat presensi', true);
             showToast('Terjadi error saat presensi', true);
-            console.error('Fetch error:', err);
             setTimeout(() => { lastScanned = ''; showResult(''); }, 2000);
         });
     }
@@ -197,7 +221,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (cameras && cameras.length) {
             qrReader.start(
                 { facingMode: 'environment' },
-                { fps: 10, qrbox: 180 },
+                { fps: 10, qrbox: window.innerWidth < 600 ? 140 : 180 },
                 onScanSuccess
             );
         } else {

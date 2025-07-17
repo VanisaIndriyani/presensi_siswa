@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Siswa;
 
 use App\Http\Controllers\Controller;
-
 use App\Models\Presensi;
 use App\Models\JamMasuk;
 use Illuminate\Http\Request;
@@ -52,4 +51,4 @@ class PresensiController extends Controller
             return redirect()->back()->with('success', 'Presensi pulang berhasil!');
         }
     }
-}
+} 

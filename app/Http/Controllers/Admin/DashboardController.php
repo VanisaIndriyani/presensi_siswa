@@ -18,6 +18,8 @@ class DashboardController extends Controller
         $terlambatHariIni = Presensi::whereDate('tanggal', today())
             ->where('status', 'terlambat')
             ->count();
+        $sakitHariIni = Presensi::whereDate('tanggal', today())->where('status', 'sakit')->count();
+        $izinHariIni = Presensi::whereDate('tanggal', today())->where('status', 'izin')->count();
 
         // Filter grafik
         $range = $request->input('range', '7hari');
@@ -25,9 +27,10 @@ class DashboardController extends Controller
         $hadirData = [];
         $terlambatData = [];
         $absenData = [];
+        $sakitData = [];
+        $izinData = [];
 
         if ($range === 'minggu') {
-            // Senin - Minggu minggu ini
             $start = Carbon::now()->startOfWeek();
             $end = Carbon::now()->endOfWeek();
             $period = \Carbon\CarbonPeriod::create($start, $end);
@@ -35,13 +38,16 @@ class DashboardController extends Controller
                 $labels[] = $date->isoFormat('ddd');
                 $hadir = Presensi::whereDate('tanggal', $date->format('Y-m-d'))->where('status', 'tepat_waktu')->count();
                 $terlambat = Presensi::whereDate('tanggal', $date->format('Y-m-d'))->where('status', 'terlambat')->count();
-                $absen = $totalSiswa - $hadir - $terlambat;
+                $sakit = Presensi::whereDate('tanggal', $date->format('Y-m-d'))->where('status', 'sakit')->count();
+                $izin = Presensi::whereDate('tanggal', $date->format('Y-m-d'))->where('status', 'izin')->count();
+                $absen = $totalSiswa - $hadir - $terlambat - $sakit - $izin;
                 $hadirData[] = $hadir;
                 $terlambatData[] = $terlambat;
+                $sakitData[] = $sakit;
+                $izinData[] = $izin;
                 $absenData[] = $absen;
             }
         } elseif ($range === 'bulan') {
-            // Tanggal 1 - hari ini bulan ini
             $start = Carbon::now()->startOfMonth();
             $end = Carbon::now();
             $period = \Carbon\CarbonPeriod::create($start, $end);
@@ -49,21 +55,28 @@ class DashboardController extends Controller
                 $labels[] = $date->isoFormat('D MMM');
                 $hadir = Presensi::whereDate('tanggal', $date->format('Y-m-d'))->where('status', 'tepat_waktu')->count();
                 $terlambat = Presensi::whereDate('tanggal', $date->format('Y-m-d'))->where('status', 'terlambat')->count();
-                $absen = $totalSiswa - $hadir - $terlambat;
+                $sakit = Presensi::whereDate('tanggal', $date->format('Y-m-d'))->where('status', 'sakit')->count();
+                $izin = Presensi::whereDate('tanggal', $date->format('Y-m-d'))->where('status', 'izin')->count();
+                $absen = $totalSiswa - $hadir - $terlambat - $sakit - $izin;
                 $hadirData[] = $hadir;
                 $terlambatData[] = $terlambat;
+                $sakitData[] = $sakit;
+                $izinData[] = $izin;
                 $absenData[] = $absen;
             }
         } else {
-            // Default: 7 hari terakhir
             for ($i = 6; $i >= 0; $i--) {
                 $tanggal = Carbon::now()->subDays($i)->format('Y-m-d');
                 $labels[] = Carbon::now()->subDays($i)->isoFormat('D MMM');
                 $hadir = Presensi::whereDate('tanggal', $tanggal)->where('status', 'tepat_waktu')->count();
                 $terlambat = Presensi::whereDate('tanggal', $tanggal)->where('status', 'terlambat')->count();
-                $absen = $totalSiswa - $hadir - $terlambat;
+                $sakit = Presensi::whereDate('tanggal', $tanggal)->where('status', 'sakit')->count();
+                $izin = Presensi::whereDate('tanggal', $tanggal)->where('status', 'izin')->count();
+                $absen = $totalSiswa - $hadir - $terlambat - $sakit - $izin;
                 $hadirData[] = $hadir;
                 $terlambatData[] = $terlambat;
+                $sakitData[] = $sakit;
+                $izinData[] = $izin;
                 $absenData[] = $absen;
             }
         }
@@ -73,9 +86,13 @@ class DashboardController extends Controller
             'totalSiswa' => $totalSiswa,
             'hadirHariIni' => $hadirHariIni,
             'terlambatHariIni' => $terlambatHariIni,
+            'sakitHariIni' => $sakitHariIni,
+            'izinHariIni' => $izinHariIni,
             'labels' => $labels,
             'hadirData' => $hadirData,
             'terlambatData' => $terlambatData,
+            'sakitData' => $sakitData,
+            'izinData' => $izinData,
             'absenData' => $absenData,
             'range' => $range,
             'liburHariIni' => $liburHariIni,

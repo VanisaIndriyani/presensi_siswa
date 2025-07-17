@@ -23,12 +23,16 @@ class DashboardController extends Controller
         $totalSiswa = $siswas->count();
         $hadir = $presensiHariIni->where('status', 'tepat_waktu')->count();
         $terlambat = $presensiHariIni->where('status', 'terlambat')->count();
-        $absen = $totalSiswa - $hadir - $terlambat;
+        $sakit = $presensiHariIni->where('status', 'sakit')->count();
+        $izin = $presensiHariIni->where('status', 'izin')->count();
+        $absen = $totalSiswa - $hadir - $terlambat - $sakit - $izin;
         $statistik = [
             'total_siswa' => $totalSiswa,
             'hadir' => $hadir,
             'terlambat' => $terlambat,
-            'absen' => $absen
+            'absen' => $absen,
+            'sakit' => $sakit,
+            'izin' => $izin,
         ];
         $guru = \App\Models\Guru::where('email', auth()->user()->email)->first();
         return view('guru.dashboard', compact('guru', 'siswas', 'presensiHariIni', 'statistik', 'tanggal'));

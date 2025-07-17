@@ -95,6 +95,20 @@
             <div class="stat-value">{{ $terlambatHariIni ?? 0 }}</div>
         </div>
     </div>
+    <div class="stat-card" style="background: linear-gradient(135deg, #38bdf8 0%, #818cf8 100%);">
+        <div class="stat-icon"><i class="fas fa-user-injured"></i></div>
+        <div class="stat-info">
+            <div class="stat-label">Sakit Hari Ini</div>
+            <div class="stat-value">{{ $sakitHariIni ?? 0 }}</div>
+        </div>
+    </div>
+    <div class="stat-card" style="background: linear-gradient(135deg, #f472b6 0%, #facc15 100%);">
+        <div class="stat-icon"><i class="fas fa-user-shield"></i></div>
+        <div class="stat-info">
+            <div class="stat-label">Izin Hari Ini</div>
+            <div class="stat-value">{{ $izinHariIni ?? 0 }}</div>
+        </div>
+    </div>
 </div>
 @if(isset($liburHariIni) && $liburHariIni)
     <div class="alert alert-info mb-3">
@@ -135,6 +149,16 @@ const kehadiranChart = new Chart(ctx, {
                 label: 'Terlambat',
                 data: @json($terlambatData),
                 backgroundColor: '#facc15'
+            },
+            {
+                label: 'Izin',
+                data: @json($izinData),
+                backgroundColor: '#38bdf8'
+            },
+            {
+                label: 'Sakit',
+                data: @json($sakitData),
+                backgroundColor: '#818cf8'
             },
             {
                 label: 'Absen',
