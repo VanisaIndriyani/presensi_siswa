@@ -36,7 +36,11 @@ class PresensiExport implements FromCollection, WithHeadings
                 'Waktu Scan' => $p->waktu_scan,
                 'Jam Pulang' => $p->jam_pulang ?? '-',
                 'Status' => $p->status == 'tepat_waktu' ? 'Tepat Waktu' : 'Terlambat',
-                'Keterangan' => ($p->status == 'tepat_waktu' && empty($p->keterangan)) ? 'Tepat waktu masuk sekolah' : $p->keterangan,
+                'Keterangan' => $p->status == 'terlambat' ? 'Datang pukul ' . (isset($p->waktu_scan) ? \Carbon\Carbon::parse($p->waktu_scan)->format('H:i') : '-') . ', melewati jam masuk 07:30'
+    : ($p->status == 'tepat_waktu' ? 'Datang pukul ' . (isset($p->waktu_scan) ? \Carbon\Carbon::parse($p->waktu_scan)->format('H:i') : '-') . ', sesuai waktu kedatangan'
+    : ($p->status == 'izin' ? ($p->keterangan ?? '-')
+    : ($p->status == 'sakit' ? 'Izin sakit, surat diserahkan ke TU'
+    : ($p->status == 'alfa' ? 'Tidak hadir tanpa keterangan' : ($p->keterangan ?? '-'))))),
             ];
         });
         return collect($data);

@@ -109,6 +109,13 @@
             <div class="stat-value">{{ $izinHariIni ?? 0 }}</div>
         </div>
     </div>
+    <div class="stat-card" style="background: linear-gradient(135deg, #6b7280 0%, #a1a1aa 100%);">
+        <div class="stat-icon"><i class="fas fa-user-slash"></i></div>
+        <div class="stat-info">
+            <div class="stat-label">Alfa Hari Ini</div>
+            <div class="stat-value">{{ $alfaHariIni ?? 0 }}</div>
+        </div>
+    </div>
 </div>
 @if(isset($liburHariIni) && $liburHariIni)
     <div class="alert alert-info mb-3">
@@ -164,6 +171,11 @@ const kehadiranChart = new Chart(ctx, {
                 label: 'Absen',
                 data: @json($absenData),
                 backgroundColor: '#ef4444'
+            },
+            {
+                label: 'Alfa',
+                data: @json($alfaData),
+                backgroundColor: '#6b7280'
             }
         ]
     },

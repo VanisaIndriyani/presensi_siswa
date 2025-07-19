@@ -122,29 +122,26 @@
                                                     <span class="badge bg-info text-white"><i class="fas fa-info-circle me-1"></i>Izin</span>
                                                 @elseif($presensi->status === 'sakit')
                                                     <span class="badge bg-danger"><i class="fas fa-medkit me-1"></i>Sakit</span>
+                                                @elseif($presensi->status === 'alfa')
+                                                    <span class="badge bg-secondary"><i class="fas fa-times me-1"></i>Alfa</span>
                                                 @endif
                                             </td>
                                             <td>
-                                                @if($presensi->keterangan)
-                                                    @if(str_contains($presensi->keterangan, 'Terlambat') && str_contains($presensi->keterangan, 'menit'))
-                                                        @php
-                                                            preg_match('/(\d+(?:\.\d+)?)/', $presensi->keterangan, $matches);
-                                                            $menit = isset($matches[1]) ? round($matches[1]) : 0;
-                                                        @endphp
-                                                        Terlambat {{ $menit }} menit
-                                                    @else
-                                                        {{ $presensi->keterangan }}
-                                                    @endif
+                                                @php
+                                                    $jam = isset($presensi->waktu_scan) ? \Carbon\Carbon::parse($presensi->waktu_scan)->format('H:i') : '-';
+                                                @endphp
+                                                @if($presensi->status === 'terlambat')
+                                                    Datang pukul {{ $jam }}, melewati jam masuk 07:30
                                                 @elseif($presensi->status === 'tepat_waktu')
-                                                    Tepat waktu
-                                                @elseif($presensi->status === 'terlambat')
-                                                    Terlambat
+                                                    Datang pukul {{ $jam }}, sesuai waktu kedatangan
                                                 @elseif($presensi->status === 'izin')
-                                                    Izin
+                                                    {{ $presensi->keterangan ?? '-' }}
                                                 @elseif($presensi->status === 'sakit')
-                                                    Sakit
+                                                    Izin sakit, surat diserahkan ke TU
+                                                @elseif($presensi->status === 'alfa')
+                                                    Tidak hadir tanpa keterangan
                                                 @else
-                                                    -
+                                                    {{ $presensi->keterangan ?? '-' }}
                                                 @endif
                                             </td>
                                             <td class="text-center">

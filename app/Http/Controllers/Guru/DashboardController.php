@@ -25,6 +25,7 @@ class DashboardController extends Controller
         $terlambat = $presensiHariIni->where('status', 'terlambat')->count();
         $sakit = $presensiHariIni->where('status', 'sakit')->count();
         $izin = $presensiHariIni->where('status', 'izin')->count();
+        $alfa = $presensiHariIni->where('status', 'alfa')->count();
         $absen = $totalSiswa - $hadir - $terlambat - $sakit - $izin;
         $statistik = [
             'total_siswa' => $totalSiswa,
@@ -33,6 +34,7 @@ class DashboardController extends Controller
             'absen' => $absen,
             'sakit' => $sakit,
             'izin' => $izin,
+            'alfa' => $alfa,
         ];
         $guru = \App\Models\Guru::where('email', auth()->user()->email)->first();
         return view('guru.dashboard', compact('guru', 'siswas', 'presensiHariIni', 'statistik', 'tanggal'));

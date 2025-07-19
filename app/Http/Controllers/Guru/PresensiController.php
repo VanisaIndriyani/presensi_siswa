@@ -40,19 +40,29 @@ class PresensiController extends Controller
             'siswa_id' => 'required|exists:siswas,id',
             'tanggal' => 'required|date',
             'waktu_scan' => 'required',
-            'status' => 'required|in:tepat_waktu,terlambat,izin,sakit',
+            'status' => 'required|in:tepat_waktu,terlambat,izin,sakit,alfa',
             'keterangan' => 'nullable|string',
         ]);
 
         // Gabungkan tanggal dan waktu
         $waktuScan = $validated['tanggal'] . ' ' . $validated['waktu_scan'];
 
+        $keterangan = null;
+        if ($validated['status'] === 'izin') {
+            $keterangan = $validated['keterangan'];
+        } elseif ($validated['status'] === 'terlambat') {
+            $keterangan = 'Terlambat masuk sekolah';
+        } elseif ($validated['status'] === 'sakit') {
+            $keterangan = 'Sakit, surat diserahkan ke TU';
+        } elseif ($validated['status'] === 'alfa') {
+            $keterangan = null;
+        }
         Presensi::create([
             'siswa_id' => $validated['siswa_id'],
             'waktu_scan' => $waktuScan,
             'status' => $validated['status'],
             'tanggal' => $validated['tanggal'],
-            'keterangan' => $validated['keterangan'],
+            'keterangan' => $keterangan,
         ]);
 
         return redirect()->route('guru.presensi.index')->with('success', 'Presensi berhasil ditambahkan!');
@@ -73,11 +83,24 @@ class PresensiController extends Controller
     public function update(Request $request, Presensi $presensi)
     {
         $validated = $request->validate([
-            'status' => 'required|in:tepat_waktu,terlambat,izin,sakit',
+            'status' => 'required|in:tepat_waktu,terlambat,izin,sakit,alfa',
             'keterangan' => 'nullable|string',
         ]);
 
-        $presensi->update($validated);
+        $keterangan = null;
+        if ($validated['status'] === 'izin') {
+            $keterangan = $validated['keterangan'];
+        } elseif ($validated['status'] === 'terlambat') {
+            $keterangan = 'Terlambat masuk sekolah';
+        } elseif ($validated['status'] === 'sakit') {
+            $keterangan = 'Sakit, surat diserahkan ke TU';
+        } elseif ($validated['status'] === 'alfa') {
+            $keterangan = null;
+        }
+        $presensi->update([
+            'status' => $validated['status'],
+            'keterangan' => $keterangan,
+        ]);
         return redirect()->route('guru.presensi.index')->with('success', 'Presensi berhasil diupdate!');
     }
 

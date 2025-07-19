@@ -82,6 +82,7 @@
                                         <option value="terlambat" {{ old('status') == 'terlambat' ? 'selected' : '' }}>Terlambat</option>
                                         <option value="izin" {{ old('status') == 'izin' ? 'selected' : '' }}>Izin</option>
                                         <option value="sakit" {{ old('status') == 'sakit' ? 'selected' : '' }}>Sakit</option>
+                                        <option value="alfa" {{ old('status') == 'alfa' ? 'selected' : '' }}>Alfa (Tidak Hadir)</option>
                                     </select>
                                     @error('status')
                                         <div class="invalid-feedback">{{ $message }}</div>

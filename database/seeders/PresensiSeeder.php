@@ -45,14 +45,33 @@ class PresensiSeeder extends Seeder
                 
                 // 90% kemungkinan hadir, 10% tidak hadir
                 if (rand(1, 100) <= 90) {
+                    // Generate jam_pulang antara 13:00 - 15:00
+                    $jamPulang = $tanggal->copy()->setTime(rand(13, 15), rand(0, 59), rand(0, 59));
                     Presensi::create([
                         'siswa_id' => $siswa->id,
                         'tanggal' => $tanggal->format('Y-m-d'),
                         'waktu_scan' => $waktuScan,
+                        'jam_pulang' => $jamPulang,
                         'status' => $status,
                         'keterangan' => $status === 'terlambat' ? 'Terlambat masuk sekolah' : null,
                     ]);
                 }
+            }
+        }
+
+        // Tambahkan 1 data presensi status 'alfa' untuk setiap siswa pada hari acak dari 7 hari terakhir
+        foreach ($siswas as $siswa) {
+            $randomDay = rand(0, 6);
+            $tanggalAlfa = Carbon::now()->subDays($randomDay)->format('Y-m-d');
+            // Cek jika sudah ada presensi di tanggal itu, skip
+            $sudahAda = Presensi::where('siswa_id', $siswa->id)->where('tanggal', $tanggalAlfa)->exists();
+            if (!$sudahAda) {
+                Presensi::create([
+                    'siswa_id' => $siswa->id,
+                    'tanggal' => $tanggalAlfa,
+                    'status' => 'alfa',
+                    'keterangan' => null,
+                ]);
             }
         }
 

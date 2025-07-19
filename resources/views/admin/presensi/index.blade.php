@@ -58,21 +58,34 @@
     <div class="alert alert-success">{{ session('success') }}</div>
 @endif
 
-<form method="GET" class="d-flex flex-wrap gap-2 align-items-center mb-3" id="filterForm" autocomplete="off">
-    <div>
-        <label for="filterKelas" class="form-label mb-0 me-2">Filter Kelas:</label>
-        <select name="kelas" id="filterKelas" class="form-select d-inline-block w-auto" style="min-width:120px;">
-            <option value="" {{ request('kelas') == '' ? 'selected' : '' }}>Semua Kelas</option>
-            <option value="X-A" {{ request('kelas') == 'X-A' ? 'selected' : '' }}>X-A</option>
-            <option value="X-B" {{ request('kelas') == 'X-B' ? 'selected' : '' }}>X-B</option>
-            <option value="XI-A" {{ request('kelas') == 'XI-A' ? 'selected' : '' }}>XI-A</option>
-            <option value="XI-B" {{ request('kelas') == 'XI-B' ? 'selected' : '' }}>XI-B</option>
-            <option value="XII-A" {{ request('kelas') == 'XII-A' ? 'selected' : '' }}>XII-A</option>
+<form id="filterForm" method="GET" class="d-flex align-items-center mb-3" action="">
+    <div class="me-2">
+        <label for="filterKelas" class="form-label mb-0">Filter Kelas:</label>
+        <select name="kelas" id="filterKelas" class="form-select" style="width:auto; display:inline-block;">
+            <option value="">Semua Kelas</option>
+            @foreach($presensis->pluck('siswa.kelas')->unique()->filter() as $kelas)
+                <option value="{{ $kelas }}" {{ request('kelas') == $kelas ? 'selected' : '' }}>{{ $kelas }}</option>
+            @endforeach
         </select>
     </div>
-    <div class="ms-auto">
-        <input type="text" name="search" id="searchPresensi" class="form-control" placeholder="Cari nama/NISN..." style="min-width:220px;" value="{{ request('search') }}">
+    <div class="me-2">
+        <label for="filterBulan" class="form-label mb-0">Filter Bulan:</label>
+        <select name="bulan" id="filterBulan" class="form-select" style="width:auto; display:inline-block;">
+            <option value="">Semua Bulan</option>
+            @for($m = 1; $m <= 12; $m++)
+                <option value="{{ sprintf('%02d', $m) }}" {{ request('bulan', now()->format('m')) == sprintf('%02d', $m) ? 'selected' : '' }}>{{ DateTime::createFromFormat('!m', $m)->format('F') }}</option>
+            @endfor
+        </select>
     </div>
+    <div class="me-2">
+        <label for="filterTahun" class="form-label mb-0">Tahun:</label>
+        <select name="tahun" id="filterTahun" class="form-select" style="width:auto; display:inline-block;">
+            @for($y = now()->year; $y >= now()->year - 5; $y--)
+                <option value="{{ $y }}" {{ request('tahun', now()->year) == $y ? 'selected' : '' }}>{{ $y }}</option>
+            @endfor
+        </select>
+    </div>
+    <button type="submit" class="btn btn-primary ms-2">Filter</button>
 </form>
 
 <div class="card shadow-sm">
@@ -110,13 +123,26 @@
                                     <span class="badge bg-warning text-dark">Sakit</span>
                                 @elseif($p->status == 'izin')
                                     <span class="badge bg-info text-dark">Izin</span>
+                                @elseif($p->status == 'alfa')
+                                    <span class="badge bg-secondary">Alfa</span>
                                 @endif
                             </td>
                             <td>
-                                @if($p->status == 'tepat_waktu' && empty($p->keterangan))
-                                    Tepat waktu masuk sekolah
+                                @php
+                                    $jam = isset($p->waktu_scan) ? \Carbon\Carbon::parse($p->waktu_scan)->format('H:i') : '-';
+                                @endphp
+                                @if($p->status === 'terlambat')
+                                    Datang pukul {{ $jam }}, melewati jam masuk 07:30
+                                @elseif($p->status === 'tepat_waktu')
+                                    Datang pukul {{ $jam }}, sesuai waktu kedatangan
+                                @elseif($p->status === 'izin')
+                                    {{ $p->keterangan ?? '-' }}
+                                @elseif($p->status === 'sakit')
+                                    Izin sakit, surat diserahkan ke TU
+                                @elseif($p->status === 'alfa')
+                                    Tidak hadir tanpa keterangan
                                 @else
-                                    {{ $p->keterangan }}
+                                    {{ $p->keterangan ?? '-' }}
                                 @endif
                             </td>
                             <td class="text-center">
@@ -328,7 +354,7 @@ function fetchPresensi() {
                         <td>${p.kelas}</td>
                         <td>${p.waktu_scan}</td>
                         <td>${p.jam_pulang ? p.jam_pulang : '-'}</td>
-                        <td>${p.status === 'tepat_waktu' ? '<span class=\'badge bg-success\'>Tepat Waktu</span>' : (p.status === 'terlambat' ? '<span class=\'badge bg-danger\'>Terlambat</span>' : (p.status === 'sakit' ? '<span class=\'badge bg-warning text-dark\'>Sakit</span>' : (p.status === 'izin' ? '<span class=\'badge bg-info text-dark\'>Izin</span>' : '')))}</td>
+                        <td>${p.status === 'tepat_waktu' ? '<span class=\'badge bg-success\'>Tepat Waktu</span>' : (p.status === 'terlambat' ? '<span class=\'badge bg-danger\'>Terlambat</span>' : (p.status === 'sakit' ? '<span class=\'badge bg-warning text-dark\'>Sakit</span>' : (p.status === 'izin' ? '<span class=\'badge bg-info text-dark\'>Izin</span>' : (p.status === 'alfa' ? '<span class=\'badge bg-secondary\'>Alfa</span>' : '')))}</td>
                         <td>${(p.status === 'tepat_waktu' && (!p.keterangan || p.keterangan === '')) ? 'Tepat waktu masuk sekolah' : (p.keterangan ?? '')}</td>
                         <td class="text-center">
                             <div class="aksi-btn-group">

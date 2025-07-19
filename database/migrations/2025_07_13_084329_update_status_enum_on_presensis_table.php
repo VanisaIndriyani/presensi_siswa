@@ -7,11 +7,11 @@ return new class extends Migration
 {
     public function up(): void
     {
-        DB::statement("ALTER TABLE presensis MODIFY status ENUM('tepat_waktu','terlambat','izin','sakit') NOT NULL");
+        DB::statement("ALTER TABLE presensis MODIFY status ENUM('tepat_waktu','terlambat','izin','sakit','alfa') NOT NULL");
     }
 
     public function down(): void
     {
-        DB::statement("ALTER TABLE presensis MODIFY status ENUM('tepat_waktu','terlambat') NOT NULL");
+        DB::statement("ALTER TABLE presensis MODIFY status ENUM('tepat_waktu','terlambat','izin','sakit') NOT NULL");
     }
 };

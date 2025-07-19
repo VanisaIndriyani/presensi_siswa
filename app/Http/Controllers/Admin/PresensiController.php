@@ -24,6 +24,10 @@ class PresensiController extends Controller
                   ->orWhere('nisn', 'like', "%$search%") ;
             });
         }
+        if ($request->bulan && $request->tahun) {
+            $query->whereMonth('tanggal', $request->bulan)
+                  ->whereYear('tanggal', $request->tahun);
+        }
         $presensis = $query->get();
         return view('admin.presensi.index', compact('presensis'));
     }

@@ -46,10 +46,21 @@
                         @endif
                     </td>
                     <td>
-                        @if($p->status == 'tepat_waktu' && empty($p->keterangan))
-                            Tepat waktu masuk sekolah
+                        @php
+                            $jam = isset($p->waktu_scan) ? \Carbon\Carbon::parse($p->waktu_scan)->format('H:i') : '-';
+                        @endphp
+                        @if($p->status === 'terlambat')
+                            Datang pukul {{ $jam }}, melewati jam masuk 07:30
+                        @elseif($p->status === 'tepat_waktu')
+                            Datang pukul {{ $jam }}, sesuai waktu kedatangan
+                        @elseif($p->status === 'izin')
+                            {{ $p->keterangan ?? '-' }}
+                        @elseif($p->status === 'sakit')
+                            Izin sakit, surat diserahkan ke TU
+                        @elseif($p->status === 'alfa')
+                            Tidak hadir tanpa keterangan
                         @else
-                            {{ $p->keterangan }}
+                            {{ $p->keterangan ?? '-' }}
                         @endif
                     </td>
                     <td>
