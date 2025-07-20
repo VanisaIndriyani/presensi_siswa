@@ -43,8 +43,9 @@ class PresensiSeeder extends Seeder
                 // Tentukan status berdasarkan waktu scan
                 $status = $waktuScan->lt($jamMasuk) ? 'tepat_waktu' : 'terlambat';
                 
-                // 90% kemungkinan hadir, 10% tidak hadir
-                if (rand(1, 100) <= 90) {
+                // 85% kemungkinan hadir, 15% tidak hadir
+                $randomNumber = rand(1, 100);
+                if ($randomNumber <= 85) {
                     // Generate jam_pulang antara 13:00 - 15:00
                     $jamPulang = $tanggal->copy()->setTime(rand(13, 15), rand(0, 59), rand(0, 59));
                     Presensi::create([
@@ -55,25 +56,30 @@ class PresensiSeeder extends Seeder
                         'status' => $status,
                         'keterangan' => $status === 'terlambat' ? 'Terlambat masuk sekolah' : null,
                     ]);
+                } else {
+                    // 15% tidak hadir - variasi status
+                    $statusTidakHadir = ['alfa', 'sakit', 'izin'];
+                    $randomStatus = $statusTidakHadir[array_rand($statusTidakHadir)];
+                    
+                    $keterangan = match($randomStatus) {
+                        'alfa' => 'Tidak hadir tanpa keterangan',
+                        'sakit' => 'Sakit',
+                        'izin' => 'Izin',
+                        default => 'Tidak hadir'
+                    };
+                    
+                    Presensi::create([
+                        'siswa_id' => $siswa->id,
+                        'tanggal' => $tanggal->format('Y-m-d'),
+                        'waktu_scan' => $tanggal->copy()->setTime(0, 0, 0),
+                        'status' => $randomStatus,
+                        'keterangan' => $keterangan,
+                    ]);
                 }
             }
         }
 
-        // Tambahkan 1 data presensi status 'alfa' untuk setiap siswa pada hari acak dari 7 hari terakhir
-        foreach ($siswas as $siswa) {
-            $randomDay = rand(0, 6);
-            $tanggalAlfa = Carbon::now()->subDays($randomDay)->format('Y-m-d');
-            // Cek jika sudah ada presensi di tanggal itu, skip
-            $sudahAda = Presensi::where('siswa_id', $siswa->id)->where('tanggal', $tanggalAlfa)->exists();
-            if (!$sudahAda) {
-                Presensi::create([
-                    'siswa_id' => $siswa->id,
-                    'tanggal' => $tanggalAlfa,
-                    'status' => 'alfa',
-                    'keterangan' => null,
-                ]);
-            }
-        }
+
 
         $this->command->info('Presensi berhasil dibuat!');
     }
