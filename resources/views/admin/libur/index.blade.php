@@ -18,6 +18,22 @@
         color: #7C3AED !important; /* Ungu untuk label */
         font-weight: 500;
     }
+    .btn-primary {
+        background: #7C3AED !important;
+        border-color: #7C3AED !important;
+    }
+    .btn-primary:hover {
+        background: #6D28D9 !important;
+        border-color: #6D28D9 !important;
+    }
+    .alert-info {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+        border: none !important;
+        color: white !important;
+    }
+    .alert-info small {
+        color: rgba(255, 255, 255, 0.8) !important;
+    }
 </style>
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h1 class="h3 mb-0 page-title">Hari Libur & Pengaturan Jam Masuk</h1>
@@ -28,27 +44,50 @@
     <div class="alert alert-success">{{ session('success') }}</div>
 @endif
 
+@if($errors->any())
+    <div class="alert alert-danger">
+        <ul class="mb-0">
+            @foreach($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
+@endif
+
 <!-- Pengaturan Jam Masuk -->
 <div class="card mb-4">
     <div class="card-body">
         <h5 class="mb-3" style="color: #3B82F6; font-weight: 600;">
             <i class="fas fa-clock me-2"></i>Pengaturan Jam Masuk
         </h5>
+        @if($jamMasuk)
+            <div class="alert alert-info mb-3">
+                <i class="fas fa-info-circle me-2"></i>
+                <strong>Jam Masuk Saat Ini:</strong> {{ $jamMasuk->start_time }} - {{ $jamMasuk->end_time }}
+                <br><small class="text-muted">Siswa dapat presensi tepat waktu jika masuk antara jam {{ $jamMasuk->start_time }} - {{ $jamMasuk->end_time }}</small>
+            </div>
+        @endif
         <form method="POST" action="{{ route('admin.libur.updateJamMasuk') }}">
             @csrf
             <div class="row">
                 <div class="col-md-4">
                     <div class="mb-3">
                         <label class="form-label">Jam Mulai Masuk</label>
-                        <input type="time" name="start_time" class="form-control" value="{{ $jamMasuk->start_time ?? '07:00' }}" required>
+                        <input type="time" name="start_time" class="form-control @error('start_time') is-invalid @enderror" value="{{ old('start_time', $jamMasuk->start_time ?? '07:00') }}" required>
                         <small class="text-muted">Jam mulai siswa bisa presensi</small>
+                        @error('start_time')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="mb-3">
                         <label class="form-label">Jam Tutup Masuk</label>
-                        <input type="time" name="end_time" class="form-control" value="{{ $jamMasuk->end_time ?? '08:30' }}" required>
+                        <input type="time" name="end_time" class="form-control @error('end_time') is-invalid @enderror" value="{{ old('end_time', $jamMasuk->end_time ?? '08:30') }}" required>
                         <small class="text-muted">Batas waktu presensi tepat waktu</small>
+                        @error('end_time')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
                     </div>
                 </div>
                 <div class="col-md-4 d-flex align-items-end">
@@ -233,6 +272,35 @@ hapusBtns.forEach(btn => {
         document.getElementById('formHapus').action = `${liburBaseUrl}/${btn.dataset.id}`;
         new bootstrap.Modal(document.getElementById('modalHapus')).show();
     });
+});
+
+// Validasi form jam masuk
+document.querySelector('form[action*="jam-masuk"]').addEventListener('submit', function(e) {
+    const startTime = document.querySelector('input[name="start_time"]').value;
+    const endTime = document.querySelector('input[name="end_time"]').value;
+    
+    if (startTime && endTime && startTime >= endTime) {
+        e.preventDefault();
+        alert('Jam tutup harus setelah jam mulai!');
+        return false;
+    }
+});
+
+// Auto-update jam tutup saat jam mulai berubah
+document.querySelector('input[name="start_time"]').addEventListener('change', function() {
+    const startTime = this.value;
+    const endTimeInput = document.querySelector('input[name="end_time"]');
+    
+    if (startTime) {
+        // Set jam tutup 1 jam setelah jam mulai
+        const startDate = new Date(`2000-01-01T${startTime}`);
+        startDate.setHours(startDate.getHours() + 1);
+        const suggestedEndTime = startDate.toTimeString().slice(0, 5);
+        
+        if (!endTimeInput.value || endTimeInput.value <= startTime) {
+            endTimeInput.value = suggestedEndTime;
+        }
+    }
 });
 </script>
 @endsection 

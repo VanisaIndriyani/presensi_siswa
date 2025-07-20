@@ -37,7 +37,8 @@ class DashboardController extends Controller
             'alfa' => $alfa,
         ];
         $guru = \App\Models\Guru::where('email', auth()->user()->email)->first();
-        return view('guru.dashboard', compact('guru', 'siswas', 'presensiHariIni', 'statistik', 'tanggal'));
+        $jamMasuk = \App\Models\JamMasuk::first();
+        return view('guru.dashboard', compact('guru', 'siswas', 'presensiHariIni', 'statistik', 'tanggal', 'jamMasuk'));
     }
 
     public function riwayat(Request $request)

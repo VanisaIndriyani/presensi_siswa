@@ -23,13 +23,6 @@ class AuthController extends Controller
             $request->session()->regenerate();
 
             $user = Auth::user();
-            // Batasi hanya satu akun guru yang bisa login
-            if ($user->role === 'guru' && $user->email !== 'guru@sekolah.com') {
-                Auth::logout();
-                return back()->withErrors([
-                    'email' => 'Akun guru hanya boleh satu. Silakan login dengan akun guru utama.',
-                ])->onlyInput('email');
-            }
 
             // Redirect berdasarkan role
             if ($user->role === 'admin') {

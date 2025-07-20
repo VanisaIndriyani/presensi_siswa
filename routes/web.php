@@ -28,6 +28,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::resource('siswa', App\Http\Controllers\Admin\SiswaController::class);
     Route::get('siswa/{siswa}/idcard', [App\Http\Controllers\Admin\SiswaController::class, 'idCard'])->name('siswa.idcard');
     Route::resource('guru', App\Http\Controllers\Admin\GuruController::class);
+    Route::get('guru/{guru}/check-account', [App\Http\Controllers\Admin\GuruController::class, 'checkAccount'])->name('guru.checkAccount');
     Route::resource('presensi', App\Http\Controllers\Admin\PresensiController::class);
     Route::resource('libur', App\Http\Controllers\Admin\LiburController::class);
     Route::resource('laporan', App\Http\Controllers\Admin\LaporanController::class)->only(['index']);

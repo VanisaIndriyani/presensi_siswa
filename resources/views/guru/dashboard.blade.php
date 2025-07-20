@@ -2,6 +2,53 @@
 
 @section('title', 'Dashboard')
 
+<style>
+    .rounded-circle {
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .card.border-primary {
+        border-width: 2px !important;
+    }
+    .card-header.bg-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+    }
+    .text-info {
+        color: #17a2b8 !important;
+    }
+    .bg-primary.rounded-circle {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+    }
+    .bg-success.rounded-circle {
+        background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%) !important;
+    }
+    .bg-info.rounded-circle {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+    }
+    .card {
+        transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    }
+    .card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+    .current-time, .current-date {
+        font-weight: 600;
+        color: #667eea;
+    }
+    .fas.fa-circle.text-success {
+        animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+        0% { opacity: 1; }
+        50% { opacity: 0.5; }
+        100% { opacity: 1; }
+    }
+</style>
+
 @section('content')
 <div class="row">
     <!-- Info Guru -->
@@ -12,10 +59,25 @@
                     <div class="col-md-8 col-12 mb-3 mb-md-0">
                         <h5 class="card-title mb-1">
                             <i class="fas fa-chalkboard-teacher text-primary me-2"></i>
-                            Selamat Datang
+                            Selamat Datang, {{ $guru ? $guru->nama : 'Guru' }}!
                         </h5>
                         <p class="text-muted mb-0">
-                            Guru dapat melihat seluruh siswa di sekolah.
+                            @if($guru)
+                                Selamat datang di Sistem Presensi Siswa. Anda dapat melihat seluruh siswa di sekolah.
+
+                                <br><small class="text-muted"><i class="fas fa-calendar me-1"></i><span class="current-date">{{ now()->format('l, d F Y') }}</span></small>
+                                <br><small class="text-muted"><i class="fas fa-clock me-1"></i><span class="current-time">{{ now()->format('H:i:s') }}</span></small>
+                                @if($jamMasuk)
+                                    <br><small class="text-success"><i class="fas fa-school me-1"></i>Jam Masuk: {{ $jamMasuk->start_time }} - {{ $jamMasuk->end_time }}</small>
+                                @endif
+                            @else
+                                Guru dapat melihat seluruh siswa di sekolah.
+                                <br><small class="text-muted"><i class="fas fa-calendar me-1"></i><span class="current-date">{{ now()->format('l, d F Y') }}</span></small>
+                                <br><small class="text-muted"><i class="fas fa-clock me-1"></i><span class="current-time">{{ now()->format('H:i:s') }}</span></small>
+                                @if($jamMasuk)
+                                    <br><small class="text-success"><i class="fas fa-school me-1"></i>Jam Masuk: {{ $jamMasuk->start_time }} - {{ $jamMasuk->end_time }}</small>
+                                @endif
+                            @endif
                         </p>
                     </div>
                     <div class="col-md-4 col-12">
@@ -24,9 +86,15 @@
                                 <div class="h4 mb-0 text-primary">{{ $statistik['total_siswa'] }}</div>
                                 <small class="text-muted">Total Siswa</small>
                             </div>
-                            <div class="text-center">
+                            <div class="text-center me-3">
                                 <div class="h4 mb-0 text-success">{{ $statistik['hadir'] }}</div>
                                 <small class="text-muted">Hadir Hari Ini</small>
+                            </div>
+                            <div class="text-center">
+                                <div class="h4 mb-0 text-info">
+                                    <i class="fas fa-circle text-success"></i>
+                                </div>
+                                <small class="text-muted">Online</small>
                             </div>
                         </div>
                     </div>
@@ -34,6 +102,55 @@
             </div>
         </div>
     </div>
+
+    <!-- Info Guru Detail -->
+    @if($guru)
+    <div class="col-12 mb-4">
+        <div class="card border-primary">
+            <div class="card-header bg-primary text-white">
+                <h6 class="mb-0"><i class="fas fa-user-tie me-2"></i>Informasi Guru</h6>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4 col-sm-6 mb-3">
+                        <div class="d-flex align-items-center">
+                            <div class="bg-primary rounded-circle p-2 me-3">
+                                <i class="fas fa-id-card text-white"></i>
+                            </div>
+                            <div>
+                                <small class="text-muted d-block">NIP</small>
+                                <strong>{{ $guru->nip }}</strong>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-sm-6 mb-3">
+                        <div class="d-flex align-items-center">
+                            <div class="bg-success rounded-circle p-2 me-3">
+                                <i class="fas fa-envelope text-white"></i>
+                            </div>
+                            <div>
+                                <small class="text-muted d-block">Email</small>
+                                <strong>{{ $guru->email }}</strong>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-sm-6 mb-3">
+                        <div class="d-flex align-items-center">
+                            <div class="bg-info rounded-circle p-2 me-3">
+                                <i class="fas fa-venus-mars text-white"></i>
+                            </div>
+                            <div>
+                                <small class="text-muted d-block">Jenis Kelamin</small>
+                                <strong>{{ $guru->jenis_kelamin ?: 'Belum diisi' }}</strong>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+    @endif
 
     <!-- Statistik -->
     <div class="col-12 col-sm-6 col-lg-3 mb-4">
@@ -102,6 +219,7 @@
                     @endif
                 </h3>
                 <p class="mb-0">Kehadiran</p>
+                <small class="opacity-75">{{ $statistik['hadir'] + $statistik['terlambat'] }}/{{ $statistik['total_siswa'] }} siswa</small>
             </div>
         </div>
     </div>
@@ -194,6 +312,37 @@
 
 @push('scripts')
 <script>
+// Update waktu real-time
+function updateTime() {
+    const now = new Date();
+    const timeString = now.toLocaleTimeString('id-ID', {
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
+    });
+    const dateString = now.toLocaleDateString('id-ID', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+    });
+    
+    // Update elemen waktu jika ada
+    const timeElements = document.querySelectorAll('.current-time');
+    timeElements.forEach(el => {
+        el.textContent = timeString;
+    });
+    
+    const dateElements = document.querySelectorAll('.current-date');
+    dateElements.forEach(el => {
+        el.textContent = dateString;
+    });
+}
+
+// Update waktu setiap detik
+setInterval(updateTime, 1000);
+updateTime(); // Update sekali saat halaman dimuat
+
 document.querySelectorAll('.btn-show').forEach(btn => {
     btn.addEventListener('click', () => {
         const id = btn.dataset.id;

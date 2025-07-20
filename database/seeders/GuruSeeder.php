@@ -34,7 +34,7 @@ class GuruSeeder extends Seeder
                 'nip' => '123456789',
                 'email' => 'guru@sekolah.com',
                 'jenis_kelamin' => 'L',
-                'kelas' => 'X-A',
+                'kelas' => 'VII-A',
             ]);
             
             $this->command->info('Guru utama berhasil ditambahkan!');

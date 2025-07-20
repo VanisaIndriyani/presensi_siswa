@@ -46,15 +46,51 @@
         color: #7C3AED !important; /* Ungu untuk label */
         font-weight: 500;
     }
+    .btn-primary {
+        background: #7C3AED !important;
+        border-color: #7C3AED !important;
+    }
+    .btn-primary:hover {
+        background: #6D28D9 !important;
+        border-color: #6D28D9 !important;
+    }
+    .card.bg-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+    }
+    .card.bg-success {
+        background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%) !important;
+    }
+    .card-title {
+        font-size: 0.9rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
 </style>
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h1 class="h3 mb-0 page-title">Daftar Guru</h1>
-  
+    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalTambah">
+        <i class="fas fa-user-plus me-2"></i> Tambah Guru
+    </button>
 </div>
 
 @if(session('success'))
     <div class="alert alert-success">{{ session('success') }}</div>
 @endif
+
+@if(session('new_guru_password'))
+    <div class="alert alert-info">
+        <h6 class="alert-heading">Akun Guru Baru Berhasil Dibuat!</h6>
+        <p class="mb-1"><strong>Email:</strong> {{ session('new_guru_email') }}</p>
+        <p class="mb-0"><strong>Password:</strong> {{ session('new_guru_password') }}</p>
+        <small class="text-muted">Simpan informasi ini dengan aman! Guru dapat langsung login dengan kredensial ini.</small>
+    </div>
+@endif
+
+@php
+    $totalGurus = \App\Models\Guru::count();
+    $gurusWithAccounts = \App\Models\User::where('role', 'guru')->count();
+@endphp
+
 
 <div class="card shadow-sm">
     <div class="card-body p-0">
@@ -67,6 +103,7 @@
                         <th>NIP</th>
                         <th>Email</th>
                         <th>Jenis Kelamin</th>
+                        <th>Status Akun</th>
                         <th class="text-center">Aksi</th>
                     </tr>
                 </thead>
@@ -78,6 +115,16 @@
                             <td>{{ $guru->nip }}</td>
                             <td>{{ $guru->email }}</td>
                             <td>{{ $guru->jenis_kelamin }}</td>
+                            <td>
+                                @php
+                                    $user = \App\Models\User::where('email', $guru->email)->first();
+                                @endphp
+                                @if($user)
+                                    <span class="badge bg-success" title="Guru dapat login ke sistem">Aktif</span>
+                                @else
+                                    <span class="badge bg-warning" title="Guru belum memiliki akun login">Belum ada akun</span>
+                                @endif
+                            </td>
                             <td class="text-center">
                                 <div class="aksi-btn-group">
                                     <button class="aksi-btn info btn-show" data-id="{{ $guru->id }}" title="Lihat">
@@ -94,7 +141,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="text-center text-muted">Belum ada data guru.</td>
+                            <td colspan="7" class="text-center text-muted">Belum ada data guru.</td>
                         </tr>
                     @endforelse
                 </tbody>
@@ -123,7 +170,8 @@
         </div>
         <div class="mb-3">
           <label class="form-label">Email</label>
-          <input type="email" name="email" class="form-control" required>
+          <input type="email" name="email" id="email" class="form-control" required>
+          <div class="invalid-feedback" id="email-error"></div>
         </div>
         <div class="mb-3">
           <label class="form-label">Jenis Kelamin</label>
@@ -132,6 +180,12 @@
             <option value="Laki-laki">Laki-laki</option>
             <option value="Perempuan">Perempuan</option>
           </select>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Password</label>
+          <input type="password" name="password" id="password" class="form-control" required minlength="6">
+          <small class="form-text text-muted">Minimal 6 karakter</small>
+          <div class="invalid-feedback" id="password-error"></div>
         </div>
       </div>
       <div class="modal-footer">
@@ -174,6 +228,11 @@
             <option value="Perempuan">Perempuan</option>
           </select>
         </div>
+        <div class="mb-3">
+          <label class="form-label">Password Baru (Opsional)</label>
+          <input type="password" name="password" id="edit-password" class="form-control" minlength="6">
+          <small class="form-text text-muted">Kosongkan jika tidak ingin mengubah password</small>
+        </div>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
@@ -197,7 +256,13 @@
           <li class="list-group-item"><b>NIP:</b> <span id="show-nip"></span></li>
           <li class="list-group-item"><b>Email:</b> <span id="show-email"></span></li>
           <li class="list-group-item"><b>Jenis Kelamin:</b> <span id="show-jenis_kelamin"></span></li>
+          <li class="list-group-item"><b>Status Akun:</b> <span id="show-status-akun"></span></li>
         </ul>
+        <div class="alert alert-info" id="login-info" style="display: none;">
+          <h6 class="alert-heading">Informasi Login:</h6>
+          <p class="mb-1"><strong>Email:</strong> <span id="login-email"></span></p>
+          <p class="mb-0"><strong>Password:</strong> <span id="login-password"></span></p>
+        </div>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
@@ -239,6 +304,34 @@ showBtns.forEach(btn => {
                 document.getElementById('show-nip').textContent = data.nip;
                 document.getElementById('show-email').textContent = data.email;
                 document.getElementById('show-jenis_kelamin').textContent = data.jenis_kelamin || '-';
+                
+                // Cek status akun
+                fetch(`{{ url('admin/guru') }}/${btn.dataset.id}/check-account`)
+                    .then(res => res.json())
+                    .then(accountData => {
+                        const statusElement = document.getElementById('show-status-akun');
+                        const loginInfo = document.getElementById('login-info');
+                        
+                        if (accountData.has_account) {
+                            statusElement.innerHTML = '<span class="badge bg-success">Aktif</span>';
+                            loginInfo.style.display = 'block';
+                            document.getElementById('login-email').textContent = data.email;
+                            
+                            // Cek apakah ini guru yang baru dibuat
+                            const newGuruEmail = '{{ session("new_guru_email") }}';
+                            const newGuruPassword = '{{ session("new_guru_password") }}';
+                            
+                            if (data.email === newGuruEmail && newGuruPassword) {
+                                document.getElementById('login-password').textContent = newGuruPassword;
+                            } else {
+                                document.getElementById('login-password').textContent = '••••••••';
+                            }
+                        } else {
+                            statusElement.innerHTML = '<span class="badge bg-warning">Belum ada akun</span>';
+                            loginInfo.style.display = 'none';
+                        }
+                    });
+                
                 new bootstrap.Modal(document.getElementById('modalShow')).show();
             });
     });
@@ -268,6 +361,46 @@ hapusBtns.forEach(btn => {
         document.getElementById('formHapus').action = `{{ url('admin/guru') }}/${btn.dataset.id}`;
         new bootstrap.Modal(document.getElementById('modalHapus')).show();
     });
+});
+
+// Validasi form tambah guru
+document.querySelector('#modalTambah form').addEventListener('submit', function(e) {
+    const password = document.getElementById('password').value;
+    const passwordError = document.getElementById('password-error');
+    const email = document.getElementById('email').value;
+    const emailError = document.getElementById('email-error');
+    
+    let isValid = true;
+    
+    // Validasi password
+    if (password.length < 6) {
+        passwordError.textContent = 'Password minimal 6 karakter';
+        document.getElementById('password').classList.add('is-invalid');
+        isValid = false;
+    } else {
+        document.getElementById('password').classList.remove('is-invalid');
+    }
+    
+    // Validasi email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+        emailError.textContent = 'Format email tidak valid';
+        document.getElementById('email').classList.add('is-invalid');
+        isValid = false;
+    } else {
+        document.getElementById('email').classList.remove('is-invalid');
+    }
+    
+    if (!isValid) {
+        e.preventDefault();
+    }
+});
+
+// Reset form saat modal ditutup
+document.getElementById('modalTambah').addEventListener('hidden.bs.modal', function() {
+    this.querySelector('form').reset();
+    document.getElementById('password').classList.remove('is-invalid');
+    document.getElementById('email').classList.remove('is-invalid');
 });
 </script>
 @endsection 

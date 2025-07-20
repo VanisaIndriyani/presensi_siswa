@@ -14,10 +14,12 @@
             top: 0;
             left: 0;
             z-index: 1000;
-            width: 16.666667%;
+            width: 280px;
             overflow-y: auto;
             max-height: 100vh;
+            transition: transform 0.3s ease-in-out;
         }
+        
         .sidebar .nav-link {
             color: rgba(255,255,255,0.8);
             padding: 12px 20px;
@@ -35,11 +37,145 @@
             width: 20px;
             margin-right: 10px;
         }
+        
+        .sidebar .nav-link {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar .nav-link {
+                padding: 15px 20px;
+                font-size: 1rem;
+            }
+            
+            .sidebar .nav-link i {
+                width: 24px;
+                margin-right: 12px;
+                font-size: 1.1rem;
+            }
+        }
+        
         .main-content {
             background-color: #f8f9fa;
             min-height: 100vh;
-            margin-left: 16.666667%;
-            width: 83.333333%;
+            margin-left: 280px;
+            width: calc(100% - 280px);
+            transition: margin-left 0.3s ease-in-out;
+        }
+        
+        .sidebar-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 999;
+            display: none;
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+        }
+        
+        .sidebar-overlay.show {
+            opacity: 1;
+        }
+        
+        .navbar-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            padding: 0.5rem;
+        }
+        
+        .mobile-header {
+            display: none;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1rem;
+            position: sticky;
+            top: 0;
+            z-index: 1001;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                width: 280px;
+            }
+            
+            .sidebar.show {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+                width: 100%;
+            }
+            
+            .navbar-toggle {
+                display: block;
+            }
+            
+            .mobile-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+            
+            .sidebar-overlay.show {
+                display: block;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .sidebar {
+                width: 100%;
+            }
+            
+            .main-content {
+                padding: 1rem !important;
+            }
+            
+            .mobile-header {
+                padding: 0.75rem;
+            }
+            
+            .mobile-header h6 {
+                font-size: 0.9rem;
+            }
+            
+            .mobile-header small {
+                font-size: 0.75rem;
+            }
+        }
+        
+        /* Tablet adjustments */
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .sidebar {
+                width: 250px;
+            }
+            
+            .main-content {
+                margin-left: 250px;
+                width: calc(100% - 250px);
+            }
+        }
+        
+        /* Large screen adjustments */
+        @media (min-width: 1025px) {
+            .sidebar {
+                width: 280px;
+            }
+            
+            .main-content {
+                margin-left: 280px;
+                width: calc(100% - 280px);
+            }
         }
         .navbar-brand {
             font-weight: bold;
@@ -49,6 +185,32 @@
             border: none;
             border-radius: 15px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        @media (max-width: 768px) {
+            .card {
+                border-radius: 10px;
+                margin-bottom: 1rem;
+            }
+            
+            .table-responsive {
+                border-radius: 10px;
+                overflow: hidden;
+            }
+            
+            .btn {
+                padding: 0.5rem 1rem;
+                font-size: 0.9rem;
+            }
+            
+            .alert {
+                border-radius: 10px;
+                margin-bottom: 1rem;
+            }
+            
+            .alert-dismissible .btn-close {
+                padding: 0.75rem;
+            }
         }
         .btn {
             border-radius: 8px;
@@ -86,13 +248,32 @@
     </style>
 </head>
 <body>
+    <!-- Sidebar Overlay -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    
+    <!-- Mobile Header -->
+    <div class="mobile-header">
+        <div class="d-flex align-items-center">
+            <button class="navbar-toggle" id="sidebarToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="ms-3">
+                <h6 class="mb-0">Sistem Presensi</h6>
+                <small>{{ auth()->user()->name }}</small>
+            </div>
+        </div>
+        <div>
+            <a href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();" class="text-white">
+                <i class="fas fa-sign-out-alt"></i>
+            </a>
+        </div>
+    </div>
+    
     <!-- Sidebar -->
-    <div class="sidebar p-3">
+    <div class="sidebar p-3" id="sidebar">
         <div class="text-center mb-4">
             <img src="{{ asset('img/logo.png') }}" alt="Logo" style="width:56px; height:56px; object-fit:contain; border-radius:12px; margin-bottom:10px; background:rgba(255,255,255,0.7); border:2px solid #fff; box-shadow:0 2px 8px rgba(102,126,234,0.10);">
-            <h5 class="text-white mb-0">
-            
-            </h5>
+            <h5 class="text-white mb-0">Sistem Presensi</h5>
             <small class="text-white-50">{{ auth()->user()->name }}</small>
         </div>
         
@@ -165,6 +346,54 @@ document.querySelectorAll('a[href="{{ route('logout') }}"]').forEach(function(el
     el.addEventListener('click', function(e) {
         if(!confirm('Yakin ingin logout?')) {
             e.preventDefault();
+        }
+    });
+});
+
+// Sidebar Toggle for Mobile
+document.addEventListener('DOMContentLoaded', function() {
+    const sidebar = document.getElementById('sidebar');
+    const sidebarToggle = document.getElementById('sidebarToggle');
+    const sidebarOverlay = document.getElementById('sidebarOverlay');
+    
+    function toggleSidebar() {
+        sidebar.classList.toggle('show');
+        sidebarOverlay.classList.toggle('show');
+        document.body.style.overflow = sidebar.classList.contains('show') ? 'hidden' : '';
+    }
+    
+    function closeSidebar() {
+        sidebar.classList.remove('show');
+        sidebarOverlay.classList.remove('show');
+        document.body.style.overflow = '';
+    }
+    
+    // Toggle sidebar when hamburger button is clicked
+    sidebarToggle.addEventListener('click', toggleSidebar);
+    
+    // Close sidebar when overlay is clicked
+    sidebarOverlay.addEventListener('click', closeSidebar);
+    
+    // Close sidebar when a nav link is clicked (mobile)
+    document.querySelectorAll('.sidebar .nav-link').forEach(link => {
+        link.addEventListener('click', function() {
+            if (window.innerWidth <= 768) {
+                closeSidebar();
+            }
+        });
+    });
+    
+    // Handle window resize
+    window.addEventListener('resize', function() {
+        if (window.innerWidth > 768) {
+            closeSidebar();
+        }
+    });
+    
+    // Close sidebar on escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && sidebar.classList.contains('show')) {
+            closeSidebar();
         }
     });
 });

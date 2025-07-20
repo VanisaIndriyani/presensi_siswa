@@ -56,14 +56,26 @@ class LiburController extends Controller
     {
         $request->validate([
             'start_time' => 'required|date_format:H:i',
-            'end_time' => 'required|date_format:H:i|after:start_time',
+            'end_time' => 'required|date_format:H:i',
+        ], [
+            'start_time.required' => 'Jam mulai masuk harus diisi',
+            'start_time.date_format' => 'Format jam mulai tidak valid',
+            'end_time.required' => 'Jam tutup masuk harus diisi',
+            'end_time.date_format' => 'Format jam tutup tidak valid',
         ]);
+
+        // Validasi manual untuk memastikan end_time setelah start_time
+        if ($request->start_time >= $request->end_time) {
+            return back()->withErrors(['end_time' => 'Jam tutup harus setelah jam mulai'])->withInput();
+        }
+
         $jamMasuk = JamMasuk::first();
         if (!$jamMasuk) {
             JamMasuk::create($request->only('start_time', 'end_time'));
         } else {
             $jamMasuk->update($request->only('start_time', 'end_time'));
         }
+        
         return redirect()->route('admin.libur.index')->with('success', 'Jam masuk berhasil diupdate!');
     }
 }
