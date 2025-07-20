@@ -18,23 +18,60 @@
         color: #7C3AED !important; /* Ungu untuk label */
         font-weight: 500;
     }
+    .stats-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 10px;
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+    .stats-number {
+        font-size: 2rem;
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
+    .stats-label {
+        font-size: 0.9rem;
+        opacity: 0.9;
+    }
 </style>
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h1 class="h3 mb-0 page-title">Laporan Presensi Siswa</h1>
     <div>
-        <a href="{{ route('admin.laporan.exportExcel', array_filter(['tanggal' => $tanggal, 'kelas' => request('kelas')])) }}" class="btn btn-success me-2">Download Excel</a>
-        <a href="{{ route('admin.laporan.exportPdf', array_filter(['tanggal' => $tanggal, 'kelas' => request('kelas')])) }}" class="btn btn-danger">Download PDF</a>
+        <a href="{{ route('admin.laporan.exportExcel', array_filter(['tanggal_mulai' => $tanggal_mulai, 'tanggal_akhir' => $tanggal_akhir, 'semester' => $semester, 'tahun_ajaran' => $tahun_ajaran, 'kelas' => request('kelas')])) }}" class="btn btn-success me-2">Download Excel</a>
+        <a href="{{ route('admin.laporan.exportPdf', array_filter(['tanggal_mulai' => $tanggal_mulai, 'tanggal_akhir' => $tanggal_akhir, 'semester' => $semester, 'tahun_ajaran' => $tahun_ajaran, 'kelas' => request('kelas')])) }}" class="btn btn-danger">Download PDF</a>
     </div>
 </div>
 
 <div class="card mb-4">
     <div class="card-body">
         <form method="GET" class="row g-3 align-items-end">
-            <div class="col-auto">
-                <label class="form-label">Filter Tanggal</label>
-                <input type="date" name="tanggal" class="form-control" value="{{ $tanggal ?? '' }}">
+            <div class="col-md-2">
+                <label class="form-label">Tanggal Mulai</label>
+                <input type="date" name="tanggal_mulai" class="form-control" value="{{ $tanggal_mulai ?? '' }}">
             </div>
-            <div class="col-auto">
+            <div class="col-md-2">
+                <label class="form-label">Tanggal Akhir</label>
+                <input type="date" name="tanggal_akhir" class="form-control" value="{{ $tanggal_akhir ?? '' }}">
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Semester</label>
+                <select name="semester" class="form-select" id="semester">
+                    <option value="">Pilih Semester</option>
+                    <option value="1" {{ $semester == '1' ? 'selected' : '' }}>Semester 1</option>
+                    <option value="2" {{ $semester == '2' ? 'selected' : '' }}>Semester 2</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Tahun Ajaran</label>
+                <select name="tahun_ajaran" class="form-select" id="tahun_ajaran">
+                    <option value="">Pilih Tahun</option>
+                    @for($i = date('Y')-2; $i <= date('Y')+1; $i++)
+                        <option value="{{ $i }}/{{ $i+1 }}" {{ $tahun_ajaran == $i.'/'.($i+1) ? 'selected' : '' }}>{{ $i }}/{{ $i+1 }}</option>
+                    @endfor
+                </select>
+            </div>
+            <div class="col-md-2">
                 <label class="form-label">Filter Kelas</label>
                 <select name="kelas" class="form-select">
                     <option value="">Semua Kelas</option>
@@ -43,11 +80,11 @@
                     @endforeach
                 </select>
             </div>
-            <div class="col-auto">
+            <div class="col-md-2">
                 <label class="form-label">Cari Nama/NISN</label>
                 <input type="text" name="search" class="form-control" value="{{ request('search') }}" placeholder="Nama atau NISN">
             </div>
-            <div class="col-auto">
+            <div class="col-12">
                 <button type="submit" class="btn btn-primary">Tampilkan</button>
                 <a href="{{ route('admin.laporan.index') }}" class="btn btn-secondary">Reset</a>
             </div>
@@ -55,9 +92,57 @@
     </div>
 </div>
 
+@if($tanggal_mulai || $semester)
+<div class="row mb-4">
+    <div class="col-md-2">
+        <div class="stats-card text-center">
+            <div class="stats-number">{{ $total_siswa }}</div>
+            <div class="stats-label">Total Siswa</div>
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="stats-card text-center" style="background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%);">
+            <div class="stats-number">{{ $tepat_waktu }}</div>
+            <div class="stats-label">Tepat Waktu</div>
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="stats-card text-center" style="background: linear-gradient(135deg, #f87171 0%, #ef4444 100%);">
+            <div class="stats-number">{{ $terlambat }}</div>
+            <div class="stats-label">Terlambat</div>
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="stats-card text-center" style="background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);">
+            <div class="stats-number">{{ $sakit }}</div>
+            <div class="stats-label">Sakit</div>
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="stats-card text-center" style="background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);">
+            <div class="stats-number">{{ $izin }}</div>
+            <div class="stats-label">Izin</div>
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="stats-card text-center" style="background: linear-gradient(135deg, #9ca3af 0%, #6b7280 100%);">
+            <div class="stats-number">{{ $alfa }}</div>
+            <div class="stats-label">Alfa</div>
+        </div>
+    </div>
+</div>
+@endif
+
 <div class="card">
     <div class="card-body">
-        <h5 class="mb-3">Rekap Presensi</h5>
+        <h5 class="mb-3">
+            Rekap Presensi
+            @if($semester && $tahun_ajaran)
+                - Semester {{ $semester }} Tahun Ajaran {{ $tahun_ajaran }}
+            @elseif($tanggal_mulai && $tanggal_akhir)
+                - {{ \Carbon\Carbon::parse($tanggal_mulai)->format('d/m/Y') }} s/d {{ \Carbon\Carbon::parse($tanggal_akhir)->format('d/m/Y') }}
+            @endif
+        </h5>
         <div class="table-responsive">
             <table class="table table-striped mb-0">
                 <thead class="table-light">
@@ -66,11 +151,11 @@
                         <th>Nama Siswa</th>
                         <th>NISN</th>
                         <th>Kelas</th>
+                        <th>Tanggal</th>
                         <th>Jam Masuk</th>
                         <th>Jam Pulang</th>
                         <th>Status</th>
                         <th>Keterangan</th>
-                       
                     </tr>
                 </thead>
                 <tbody>
@@ -80,9 +165,10 @@
                             <td>{{ $p->siswa->nama ?? '-' }}</td>
                             <td>{{ $p->siswa->nisn ?? '-' }}</td>
                             <td>{{ $p->siswa->kelas ?? '-' }}</td>
-                            <td>{{ $p->waktu_scan }}</td>
+                            <td>{{ \Carbon\Carbon::parse($p->tanggal)->format('d/m/Y') }}</td>
+                            <td>{{ $p->waktu_scan ? \Carbon\Carbon::parse($p->waktu_scan)->format('H:i') : '-' }}</td>
                             <td>
-                                {{ $p->jam_pulang ? $p->jam_pulang : '-' }}
+                                {{ $p->jam_pulang ? \Carbon\Carbon::parse($p->jam_pulang)->format('H:i') : '-' }}
                             </td>
                             <td>
                                 @if($p->status == 'tepat_waktu')
@@ -93,6 +179,8 @@
                                     <span class="badge bg-warning text-dark">Sakit</span>
                                 @elseif($p->status == 'izin')
                                     <span class="badge bg-info text-dark">Izin</span>
+                                @elseif($p->status == 'alfa')
+                                    <span class="badge bg-secondary">Alfa</span>
                                 @else
                                     <span class="badge bg-secondary">{{ ucfirst($p->status) }}</span>
                                 @endif
@@ -115,11 +203,10 @@
                                     {{ $p->keterangan ?? '-' }}
                                 @endif
                             </td>
-                          
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="7" class="text-center text-muted">Belum ada data presensi.</td>
+                            <td colspan="9" class="text-center text-muted">Belum ada data presensi.</td>
                         </tr>
                     @endforelse
                 </tbody>
@@ -127,4 +214,61 @@
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const semesterSelect = document.getElementById('semester');
+    const tahunAjaranSelect = document.getElementById('tahun_ajaran');
+    const tanggalMulaiInput = document.querySelector('input[name="tanggal_mulai"]');
+    const tanggalAkhirInput = document.querySelector('input[name="tanggal_akhir"]');
+    
+    // Ketika semester dipilih, disable input tanggal
+    semesterSelect.addEventListener('change', function() {
+        if (this.value) {
+            tanggalMulaiInput.disabled = true;
+            tanggalAkhirInput.disabled = true;
+            tanggalMulaiInput.value = '';
+            tanggalAkhirInput.value = '';
+        } else {
+            tanggalMulaiInput.disabled = false;
+            tanggalAkhirInput.disabled = false;
+        }
+    });
+    
+    // Ketika tanggal diisi, disable semester
+    tanggalMulaiInput.addEventListener('change', function() {
+        if (this.value) {
+            semesterSelect.disabled = true;
+            tahunAjaranSelect.disabled = true;
+            semesterSelect.value = '';
+            tahunAjaranSelect.value = '';
+        } else {
+            semesterSelect.disabled = false;
+            tahunAjaranSelect.disabled = false;
+        }
+    });
+    
+    tanggalAkhirInput.addEventListener('change', function() {
+        if (this.value) {
+            semesterSelect.disabled = true;
+            tahunAjaranSelect.disabled = true;
+            semesterSelect.value = '';
+            tahunAjaranSelect.value = '';
+        } else {
+            semesterSelect.disabled = false;
+            tahunAjaranSelect.disabled = false;
+        }
+    });
+    
+    // Set initial state
+    if (semesterSelect.value) {
+        tanggalMulaiInput.disabled = true;
+        tanggalAkhirInput.disabled = true;
+    }
+    if (tanggalMulaiInput.value) {
+        semesterSelect.disabled = true;
+        tahunAjaranSelect.disabled = true;
+    }
+});
+</script>
 @endsection 
