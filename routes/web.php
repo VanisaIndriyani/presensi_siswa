@@ -90,6 +90,7 @@ Route::get('/api/siswa-by-status/{status}', function($status) {
                 ->whereIn('status', ['tepat_waktu', 'terlambat'])
                 ->get();
         } elseif ($status === 'absen') {
+            // Untuk absen, ambil siswa yang tidak ada presensi hari ini
             $siswaHadir = \App\Models\Presensi::whereDate('tanggal', $today)->pluck('siswa_id');
             $siswas = Siswa::whereNotIn('id', $siswaHadir)->get();
             
@@ -105,6 +106,7 @@ Route::get('/api/siswa-by-status/{status}', function($status) {
             
             return response()->json($data);
         } else {
+            // Untuk status lainnya (tepat_waktu, terlambat, sakit, izin, alpa)
             $presensis = \App\Models\Presensi::with('siswa')
                 ->whereDate('tanggal', $today)
                 ->where('status', $status)
