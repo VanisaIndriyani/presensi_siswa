@@ -307,8 +307,32 @@ document.addEventListener('DOMContentLoaded', function() {
                     .then(res => res.json())
                     .then(data => {
                         document.getElementById('edit-status').value = data.status;
-                        document.getElementById('edit-keterangan').value = data.keterangan || '';
+                        
+                        // Generate keterangan yang sama seperti di tabel
+                        let keterangan = '';
+                        const jam = data.waktu_scan ? new Date(data.waktu_scan).toLocaleTimeString('id-ID', {hour: '2-digit', minute: '2-digit'}) : '-';
+                        
+                        if (data.status === 'terlambat') {
+                            keterangan = `Datang pukul ${jam}, melewati jam masuk 07:30`;
+                        } else if (data.status === 'tepat_waktu') {
+                            keterangan = `Datang pukul ${jam}, sesuai waktu kedatangan`;
+                        } else if (data.status === 'izin') {
+                            keterangan = data.keterangan || '';
+                        } else if (data.status === 'sakit') {
+                            keterangan = 'Izin sakit, surat diserahkan ke TU';
+                        } else if (data.status === 'alpa') {
+                            keterangan = 'Tidak hadir tanpa keterangan';
+                        } else {
+                            keterangan = data.keterangan || '';
+                        }
+                        
+                        document.getElementById('edit-keterangan').value = keterangan;
                         document.getElementById('formEdit').action = `${presensiBaseUrl}/${btn.dataset.id}`;
+                        
+                        // Store waktu_scan for auto-update feature
+                        const formEdit = document.getElementById('formEdit');
+                        formEdit.setAttribute('data-waktu-scan', data.waktu_scan);
+                        
                         new bootstrap.Modal(document.getElementById('modalEdit')).show();
                     })
                     .catch(error => {
@@ -329,6 +353,33 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Attach events on page load
     attachActionEvents();
+    
+    // Auto-update keterangan when status changes in edit modal
+    document.getElementById('edit-status').addEventListener('change', function() {
+        const status = this.value;
+        const keteranganField = document.getElementById('edit-keterangan');
+        const formEdit = document.getElementById('formEdit');
+        const waktuScan = formEdit.getAttribute('data-waktu-scan');
+        
+        let keterangan = '';
+        const jam = waktuScan ? new Date(waktuScan).toLocaleTimeString('id-ID', {hour: '2-digit', minute: '2-digit'}) : '-';
+        
+        if (status === 'terlambat') {
+            keterangan = `Datang pukul ${jam}, melewati jam masuk 07:30`;
+        } else if (status === 'tepat_waktu') {
+            keterangan = `Datang pukul ${jam}, sesuai waktu kedatangan`;
+        } else if (status === 'izin') {
+            keterangan = keteranganField.value || '';
+        } else if (status === 'sakit') {
+            keterangan = 'Izin sakit, surat diserahkan ke TU';
+        } else if (status === 'alpa') {
+            keterangan = 'Tidak hadir tanpa keterangan';
+        } else {
+            keterangan = keteranganField.value || '';
+        }
+        
+        keteranganField.value = keterangan;
+    });
     
     // Filter form submission
     document.getElementById('filterForm').addEventListener('submit', function(e) {
