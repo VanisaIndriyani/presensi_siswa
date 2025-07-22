@@ -271,7 +271,26 @@ document.addEventListener('DOMContentLoaded', function() {
                             (data.status === 'sakit' ? 'Sakit' : 
                             (data.status === 'izin' ? 'Izin' : 
                             (data.status === 'alpa' ? 'Alpa' : data.status))));
-                        document.getElementById('show-keterangan').textContent = data.keterangan || '-';
+                        
+                        // Generate keterangan yang sama seperti di tabel
+                        let keterangan = '';
+                        const jam = data.waktu_scan ? new Date(data.waktu_scan).toLocaleTimeString('id-ID', {hour: '2-digit', minute: '2-digit'}) : '-';
+                        
+                        if (data.status === 'terlambat') {
+                            keterangan = `Datang pukul ${jam}, melewati jam masuk 07:30`;
+                        } else if (data.status === 'tepat_waktu') {
+                            keterangan = `Datang pukul ${jam}, sesuai waktu kedatangan`;
+                        } else if (data.status === 'izin') {
+                            keterangan = data.keterangan || '-';
+                        } else if (data.status === 'sakit') {
+                            keterangan = 'Izin sakit, surat diserahkan ke TU';
+                        } else if (data.status === 'alpa') {
+                            keterangan = 'Tidak hadir tanpa keterangan';
+                        } else {
+                            keterangan = data.keterangan || '-';
+                        }
+                        
+                        document.getElementById('show-keterangan').textContent = keterangan;
                         new bootstrap.Modal(document.getElementById('modalShow')).show();
                     })
                     .catch(error => {
