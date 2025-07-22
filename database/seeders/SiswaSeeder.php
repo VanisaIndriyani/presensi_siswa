@@ -18,7 +18,6 @@ class SiswaSeeder extends Seeder
                 'nisn' => '1234567890',
                 'kelas' => 'VII-A',
                 'jenis_kelamin' => 'Laki-laki',
-                'alamat' => 'Jl. Merdeka No. 123, Jakarta',
                 'qr_code' => 'QR001'
             ],
             [
@@ -26,7 +25,6 @@ class SiswaSeeder extends Seeder
                 'nisn' => '1234567891',
                 'kelas' => 'VII-A',
                 'jenis_kelamin' => 'Perempuan',
-                'alamat' => 'Jl. Sudirman No. 45, Jakarta',
                 'qr_code' => 'QR002'
             ],
             [
@@ -34,7 +32,6 @@ class SiswaSeeder extends Seeder
                 'nisn' => '1234567892',
                 'kelas' => 'VII-B',
                 'jenis_kelamin' => 'Laki-laki',
-                'alamat' => 'Jl. Thamrin No. 67, Jakarta',
                 'qr_code' => 'QR003'
             ],
             [
@@ -42,7 +39,6 @@ class SiswaSeeder extends Seeder
                 'nisn' => '1234567893',
                 'kelas' => 'VII-B',
                 'jenis_kelamin' => 'Perempuan',
-                'alamat' => 'Jl. Gatot Subroto No. 89, Jakarta',
                 'qr_code' => 'QR004'
             ],
             [
@@ -50,7 +46,6 @@ class SiswaSeeder extends Seeder
                 'nisn' => '1234567894',
                 'kelas' => 'VIII-A',
                 'jenis_kelamin' => 'Laki-laki',
-                'alamat' => 'Jl. Rasuna Said No. 12, Jakarta',
                 'qr_code' => 'QR005'
             ],
             [
@@ -58,7 +53,6 @@ class SiswaSeeder extends Seeder
                 'nisn' => '1234567895',
                 'kelas' => 'VIII-A',
                 'jenis_kelamin' => 'Perempuan',
-                'alamat' => 'Jl. Kuningan No. 34, Jakarta',
                 'qr_code' => 'QR006'
             ],
             [
@@ -66,7 +60,6 @@ class SiswaSeeder extends Seeder
                 'nisn' => '1234567896',
                 'kelas' => 'VIII-B',
                 'jenis_kelamin' => 'Laki-laki',
-                'alamat' => 'Jl. Senayan No. 56, Jakarta',
                 'qr_code' => 'QR007'
             ],
             [
@@ -74,7 +67,6 @@ class SiswaSeeder extends Seeder
                 'nisn' => '1234567897',
                 'kelas' => 'VIII-B',
                 'jenis_kelamin' => 'Perempuan',
-                'alamat' => 'Jl. Kebayoran No. 78, Jakarta',
                 'qr_code' => 'QR008'
             ],
             [
@@ -82,7 +74,6 @@ class SiswaSeeder extends Seeder
                 'nisn' => '1234567898',
                 'kelas' => 'IX-A',
                 'jenis_kelamin' => 'Laki-laki',
-                'alamat' => 'Jl. Mampang No. 90, Jakarta',
                 'qr_code' => 'QR009'
             ],
             [
@@ -90,13 +81,15 @@ class SiswaSeeder extends Seeder
                 'nisn' => '1234567899',
                 'kelas' => 'IX-A',
                 'jenis_kelamin' => 'Perempuan',
-                'alamat' => 'Jl. Tebet No. 11, Jakarta',
                 'qr_code' => 'QR010'
             ],
         ];
 
         foreach ($siswas as $siswa) {
-            Siswa::create($siswa);
+            Siswa::updateOrCreate(
+                ['nisn' => $siswa['nisn']], // Cari berdasarkan NISN
+                $siswa // Data yang akan diupdate atau dibuat
+            );
         }
 
         $this->command->info('Siswa berhasil dibuat!');
