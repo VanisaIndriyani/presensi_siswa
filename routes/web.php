@@ -71,3 +71,67 @@ Route::middleware(['auth', 'role:kepala_sekolah'])->prefix('kepala-sekolah')->na
 Route::get('/admin/siswa/{siswa}/qrcode', function(App\Models\Siswa $siswa) {
     return \QrCode::format('png')->size(200)->generate($siswa->qr_code);
 });
+
+// API siswa untuk kebutuhan frontend (hotfix error 404)
+use App\Models\Siswa;
+
+Route::get('/api/siswa', function() {
+    return response()->json(Siswa::all());
+});
+
+// API siswa by status untuk guru dashboard (hotfix error 404)
+Route::get('/api/siswa-by-status/{status}', function($status) {
+    try {
+        $today = today()->toDateString();
+        
+        if ($status === 'kehadiran') {
+            $presensis = \App\Models\Presensi::with('siswa')
+                ->whereDate('tanggal', $today)
+                ->whereIn('status', ['tepat_waktu', 'terlambat'])
+                ->get();
+        } elseif ($status === 'absen') {
+            $siswaHadir = \App\Models\Presensi::whereDate('tanggal', $today)->pluck('siswa_id');
+            $siswas = Siswa::whereNotIn('id', $siswaHadir)->get();
+            
+            $data = [];
+            foreach ($siswas as $siswa) {
+                $data[] = [
+                    'nama' => $siswa->nama,
+                    'nisn' => $siswa->nisn,
+                    'kelas' => $siswa->kelas,
+                    'status' => 'Tidak Hadir'
+                ];
+            }
+            
+            return response()->json($data);
+        } else {
+            $presensis = \App\Models\Presensi::with('siswa')
+                ->whereDate('tanggal', $today)
+                ->where('status', $status)
+                ->get();
+        }
+
+        $data = [];
+        foreach ($presensis as $p) {
+            $statusText = match($p->status) {
+                'tepat_waktu' => 'Tepat Waktu',
+                'terlambat' => 'Terlambat',
+                'sakit' => 'Sakit',
+                'izin' => 'Izin',
+                'alpa' => 'Alpa',
+                default => ucfirst($p->status)
+            };
+            
+            $data[] = [
+                'nama' => $p->siswa ? $p->siswa->nama : '-',
+                'nisn' => $p->siswa ? $p->siswa->nisn : '-',
+                'kelas' => $p->siswa ? $p->siswa->kelas : '-',
+                'status' => $statusText
+            ];
+        }
+
+        return response()->json($data);
+    } catch (\Exception $e) {
+        return response()->json(['error' => 'Terjadi kesalahan: ' . $e->getMessage()], 500);
+    }
+});

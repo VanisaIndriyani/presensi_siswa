@@ -460,7 +460,7 @@ function showSiswaByStatus(status) {
     emptySiswa.classList.add('d-none');
     siswaTableBody.innerHTML = ''; // Clear previous data
 
-    fetch(`/guru/presensi/siswa-by-status/${status}`)
+    fetch(`/api/siswa-by-status/${status}`)
         .then(res => {
             if (!res.ok) {
                 throw new Error(`HTTP error! status: ${res.status}`);
