@@ -296,7 +296,7 @@
             </a>
             <a class="nav-link {{ request()->routeIs('admin.libur.*') ? 'active' : '' }}" href="{{ route('admin.libur.index') }}">
                 <i class="fas fa-calendar-times"></i>
-              Hari Libur
+                Pengaturan waktu & hari libur
             </a>
             <a class="nav-link {{ request()->routeIs('admin.laporan.*') ? 'active' : '' }}" href="{{ route('admin.laporan.index') }}">
                 <i class="fas fa-chart-bar"></i>
