@@ -412,7 +412,7 @@ document.querySelectorAll('.btn-show').forEach(btn => {
 document.querySelectorAll('.btn-edit').forEach(btn => {
     btn.addEventListener('click', () => {
         const id = btn.dataset.id;
-        fetch(`/guru/presensi/${id}/edit`)
+        fetch(`{{ url('/guru/presensi') }}/${id}/edit`)
             .then(res => res.json())
             .then(data => {
                 document.getElementById('edit-nama').textContent = data.siswa?.nama || '-';
@@ -420,7 +420,7 @@ document.querySelectorAll('.btn-edit').forEach(btn => {
                 document.getElementById('edit-waktu_scan').textContent = data.waktu_scan;
                 document.querySelector('select[name="status"]').value = data.status;
                 document.querySelector('textarea[name="keterangan"]').value = data.keterangan || '';
-                document.getElementById('formEdit').action = `/guru/presensi/${id}`;
+                document.getElementById('formEdit').action = `{{ url('/guru/presensi') }}/${id}`;
                 new bootstrap.Modal(document.getElementById('modalEdit')).show();
             });
     });
@@ -431,7 +431,7 @@ document.querySelectorAll('.btn-delete').forEach(btn => {
         const id = btn.dataset.id;
         const nama = btn.dataset.nama;
         document.getElementById('delete-nama').textContent = nama;
-        document.getElementById('formDelete').action = `/guru/presensi/${id}`;
+        document.getElementById('formDelete').action = `{{ url('/guru/presensi') }}/${id}`;
         new bootstrap.Modal(document.getElementById('modalDelete')).show();
     });
 });
@@ -460,7 +460,7 @@ function showSiswaByStatus(status) {
     emptySiswa.classList.add('d-none');
     siswaTableBody.innerHTML = ''; // Clear previous data
 
-    fetch(`/api/siswa-by-status/${status}`)
+    fetch(`{{ url('/api/siswa-by-status') }}/${status}`)
         .then(res => {
             if (!res.ok) {
                 throw new Error(`HTTP error! status: ${res.status}`);
