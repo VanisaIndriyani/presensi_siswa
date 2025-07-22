@@ -61,6 +61,7 @@ Route::middleware(['auth', 'role:siswa'])->prefix('siswa')->name('siswa.')->grou
 // Kepala Sekolah routes
 Route::middleware(['auth', 'role:kepala_sekolah'])->prefix('kepala-sekolah')->name('kepala-sekolah.')->group(function () {
     Route::get('/', [App\Http\Controllers\KepalaSekolah\DashboardController::class, 'index'])->name('dashboard');
+    Route::get('siswa-alpa', [App\Http\Controllers\KepalaSekolah\DashboardController::class, 'getSiswaAlpa'])->name('siswa.alpa');
     Route::resource('laporan', App\Http\Controllers\KepalaSekolah\LaporanController::class)->only(['index']);
     Route::get('laporan/export-excel', [App\Http\Controllers\KepalaSekolah\LaporanController::class, 'exportExcel'])->name('laporan.exportExcel');
     Route::get('laporan/export-pdf', [App\Http\Controllers\KepalaSekolah\LaporanController::class, 'exportPdf'])->name('laporan.exportPdf');

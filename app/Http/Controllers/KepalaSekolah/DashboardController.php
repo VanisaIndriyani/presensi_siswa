@@ -154,4 +154,25 @@ class DashboardController extends Controller
             'alpaData'
         ));
     }
+
+    public function getSiswaAlpa()
+    {
+        $today = Carbon::today();
+        
+        // Ambil siswa yang alpa hari ini
+        $siswaAlpa = Presensi::whereDate('tanggal', $today)
+            ->where('status', 'alpa')
+            ->with('siswa')
+            ->get()
+            ->map(function($presensi) {
+                return [
+                    'nama' => $presensi->siswa->nama ?? '-',
+                    'nisn' => $presensi->siswa->nisn ?? '-',
+                    'kelas' => $presensi->siswa->kelas ?? '-',
+                    'jenis_kelamin' => $presensi->siswa->jenis_kelamin ?? '-'
+                ];
+            });
+        
+        return response()->json($siswaAlpa);
+    }
 }
