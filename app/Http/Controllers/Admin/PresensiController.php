@@ -48,7 +48,7 @@ class PresensiController extends Controller
     {
         $validated = $request->validate([
             'keterangan' => 'nullable|string|max:255',
-            'status' => 'required|in:tepat_waktu,terlambat',
+            'status' => 'required|in:tepat_waktu,terlambat,sakit,izin,alpa',
         ]);
         $presensi->update($validated);
         return redirect()->route('admin.presensi.index')->with('success', 'Presensi berhasil diupdate!');
