@@ -3,94 +3,148 @@
 namespace App\Exports;
 
 use App\Models\Presensi;
+use App\Models\Siswa;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
+use Maatwebsite\Excel\Concerns\WithEvents;
+use Maatwebsite\Excel\Events\AfterSheet;
 
-class PresensiExport implements FromCollection, WithHeadings
+class PresensiExport implements FromCollection, WithHeadings, WithEvents
 {
     protected $tanggal_mulai;
     protected $tanggal_akhir;
     protected $kelas;
-    
+    protected $rekap;
+    protected $total;
+    protected $rata;
+
     public function __construct($tanggal_mulai = null, $tanggal_akhir = null, $kelas = null)
     {
         $this->tanggal_mulai = $tanggal_mulai;
         $this->tanggal_akhir = $tanggal_akhir;
         $this->kelas = $kelas;
     }
-    
+
     public function collection()
     {
-        $query = Presensi::with('siswa')
-            ->when($this->tanggal_mulai, function($q) {
-                $q->whereDate('tanggal', '>=', $this->tanggal_mulai);
+        $siswaQuery = Siswa::query();
+        if ($this->kelas) {
+            $siswaQuery->where('kelas', $this->kelas);
+        }
+        $siswas = $siswaQuery->orderBy('nama')->get();
+
+        $tanggal_mulai = $this->tanggal_mulai;
+        $tanggal_akhir = $this->tanggal_akhir;
+
+        // Ambil semua tanggal unik presensi dalam rentang
+        $tanggalList = Presensi::query()
+            ->when($tanggal_mulai, function($q) use ($tanggal_mulai) {
+                $q->whereDate('tanggal', '>=', $tanggal_mulai);
             })
-            ->when($this->tanggal_akhir, function($q) {
-                $q->whereDate('tanggal', '<=', $this->tanggal_akhir);
+            ->when($tanggal_akhir, function($q) use ($tanggal_akhir) {
+                $q->whereDate('tanggal', '<=', $tanggal_akhir);
             })
             ->when($this->kelas, function($q) {
                 $q->whereHas('siswa', function($q) {
                     $q->where('kelas', $this->kelas);
                 });
             })
-            ->orderByDesc('waktu_scan');
-            
-        $data = $query->get()->map(function($p, $i) {
-            return [
+            ->distinct('tanggal')
+            ->pluck('tanggal');
+        $totalHari = $tanggalList->count();
+
+        $rekap = [];
+        $total = [
+            'total_hari' => $totalHari,
+            'hadir' => 0,
+            'tidak_hadir' => 0,
+            'izin' => 0,
+            'sakit' => 0,
+            'alpa' => 0,
+        ];
+
+        foreach ($siswas as $i => $siswa) {
+            $presensis = Presensi::where('siswa_id', $siswa->id)
+                ->when($tanggal_mulai, function($q) use ($tanggal_mulai) {
+                    $q->whereDate('tanggal', '>=', $tanggal_mulai);
+                })
+                ->when($tanggal_akhir, function($q) use ($tanggal_akhir) {
+                    $q->whereDate('tanggal', '<=', $tanggal_akhir);
+                })
+                ->get();
+            $hadir = $presensis->whereIn('status', ['tepat_waktu', 'terlambat'])->count();
+            $izin = $presensis->where('status', 'izin')->count();
+            $sakit = $presensis->where('status', 'sakit')->count();
+                    $alpa = $presensis->where('status', 'alpa')->count();
+        $tidak_hadir = $izin + $sakit + $alpa;
+            $persen = $totalHari > 0 ? round(($hadir / $totalHari) * 100) : 0;
+
+            $rekap[] = [
                 'No' => $i+1,
-                'Nama Siswa' => $p->siswa->nama ?? '-',
-                'NISN' => $p->siswa->nisn ?? '-',
-                'Kelas' => $p->siswa->kelas ?? '-',
-                'Tanggal' => \Carbon\Carbon::parse($p->tanggal)->format('d/m/Y'),
-                'Jam Masuk' => $p->waktu_scan ? \Carbon\Carbon::parse($p->waktu_scan)->format('H:i') : '-',
-                'Jam Pulang' => $p->jam_pulang ? \Carbon\Carbon::parse($p->jam_pulang)->format('H:i') : '-',
-                'Status' => $this->getStatusText($p->status),
-                'Keterangan' => $this->getKeterangan($p),
+                'Nama Siswa' => $siswa->nama,
+                'NISN' => $siswa->nisn,
+                'Kelas' => $siswa->kelas,
+                'Total Hari Sekolah' => $totalHari,
+                'Hadir' => $hadir,
+                'Tidak Hadir' => $tidak_hadir,
+                'Izin' => $izin,
+                'Sakit' => $sakit,
+                'Alpa' => $alpa,
+                'Persentase Kehadiran' => $persen . '%',
             ];
-        });
-        return collect($data);
+            $total['hadir'] += $hadir;
+            $total['tidak_hadir'] += $tidak_hadir;
+            $total['izin'] += $izin;
+            $total['sakit'] += $sakit;
+            $total['alpa'] += $alpa;
+        }
+        $jumlahSiswa = max(count($siswas), 1);
+        $this->rekap = $rekap;
+        $this->total = [
+            '', 'Total', '', '', $totalHari * $jumlahSiswa, $total['hadir'], $total['tidak_hadir'], $total['izin'], $total['sakit'], $total['alpa'], ''
+        ];
+        $this->rata = [
+            '', 'Rata-rata', '', '', $totalHari, 
+            $jumlahSiswa > 0 ? round($total['hadir'] / $jumlahSiswa) : 0,
+            $jumlahSiswa > 0 ? round($total['tidak_hadir'] / $jumlahSiswa) : 0,
+            $jumlahSiswa > 0 ? round($total['izin'] / $jumlahSiswa) : 0,
+            $jumlahSiswa > 0 ? round($total['sakit'] / $jumlahSiswa) : 0,
+            $jumlahSiswa > 0 ? round($total['alpa'] / $jumlahSiswa) : 0,
+            $totalHari > 0 ? round(($total['hadir'] / ($jumlahSiswa * $totalHari)) * 100) . '%' : '0%'
+        ];
+        return collect($rekap);
     }
-    
+
     public function headings(): array
     {
-        return ['No', 'Nama Siswa', 'NISN', 'Kelas', 'Tanggal', 'Jam Masuk', 'Jam Pulang', 'Status', 'Keterangan'];
+        return ['No', 'Nama Siswa', 'NISN', 'Kelas', 'Total Hari Sekolah', 'Hadir', 'Tidak Hadir', 'Izin', 'Sakit', 'Alpa', 'Persentase Kehadiran'];
     }
-    
-    private function getStatusText($status)
+
+    public function registerEvents(): array
     {
-        switch($status) {
-            case 'tepat_waktu':
-                return 'Tepat Waktu';
-            case 'terlambat':
-                return 'Terlambat';
-            case 'sakit':
-                return 'Sakit';
-            case 'izin':
-                return 'Izin';
-            case 'alfa':
-                return 'Alfa';
-            default:
-                return ucfirst($status);
-        }
-    }
-    
-    private function getKeterangan($presensi)
-    {
-        $jam = isset($presensi->waktu_scan) ? \Carbon\Carbon::parse($presensi->waktu_scan)->format('H:i') : '-';
-        
-        switch($presensi->status) {
-            case 'terlambat':
-                return "Datang pukul {$jam}, melewati jam masuk 07:30";
-            case 'tepat_waktu':
-                return "Datang pukul {$jam}, sesuai waktu kedatangan";
-            case 'izin':
-                return $presensi->keterangan ?? '-';
-            case 'sakit':
-                return 'Izin sakit, surat diserahkan ke TU';
-            case 'alfa':
-                return 'Tidak hadir tanpa keterangan';
-            default:
-                return $presensi->keterangan ?? '-';
-        }
+        return [
+            AfterSheet::class => function(AfterSheet $event) {
+                $lastRow = count($this->rekap) + 2;
+                
+                // Tambahkan baris total
+                $event->sheet->setCellValue("A{$lastRow}", 'Total');
+                $event->sheet->setCellValue("E{$lastRow}", $this->total[4]);
+                $event->sheet->setCellValue("F{$lastRow}", $this->total[5]);
+                $event->sheet->setCellValue("G{$lastRow}", $this->total[6]);
+                $event->sheet->setCellValue("H{$lastRow}", $this->total[7]);
+                $event->sheet->setCellValue("I{$lastRow}", $this->total[8]);
+                $event->sheet->setCellValue("J{$lastRow}", $this->total[9]);
+                
+                // Tambahkan baris rata-rata
+                $lastRow++;
+                $event->sheet->setCellValue("A{$lastRow}", 'Rata-rata');
+                $event->sheet->setCellValue("E{$lastRow}", $this->rata[4]);
+                $event->sheet->setCellValue("F{$lastRow}", $this->rata[5]);
+                $event->sheet->setCellValue("G{$lastRow}", $this->rata[6]);
+                $event->sheet->setCellValue("H{$lastRow}", $this->rata[7]);
+                $event->sheet->setCellValue("I{$lastRow}", $this->rata[8]);
+                $event->sheet->setCellValue("J{$lastRow}", $this->rata[9]);
+            }
+        ];
     }
 }

@@ -58,11 +58,11 @@ class PresensiSeeder extends Seeder
                     ]);
                 } else {
                     // 15% tidak hadir - variasi status
-                    $statusTidakHadir = ['alfa', 'sakit', 'izin'];
+                    $statusTidakHadir = ['alpa', 'sakit', 'izin'];
                     $randomStatus = $statusTidakHadir[array_rand($statusTidakHadir)];
                     
                     $keterangan = match($randomStatus) {
-                        'alfa' => 'Tidak hadir tanpa keterangan',
+                        'alpa' => 'Tidak hadir tanpa keterangan',
                         'sakit' => 'Sakit',
                         'izin' => 'Izin',
                         default => 'Tidak hadir'

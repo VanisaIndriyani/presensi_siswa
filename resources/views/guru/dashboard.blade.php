@@ -35,6 +35,13 @@
         transform: translateY(-2px);
         box-shadow: 0 4px 15px rgba(0,0,0,0.1);
     }
+    .card[onclick] {
+        cursor: pointer;
+    }
+    .card[onclick]:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+    }
     .current-time, .current-date {
         font-weight: 600;
         color: #667eea;
@@ -154,7 +161,7 @@
 
     <!-- Statistik -->
     <div class="col-12 col-sm-6 col-lg-3 mb-4">
-        <div class="card bg-success text-white text-center">
+        <div class="card bg-success text-white text-center" style="cursor: pointer;" onclick="showSiswaByStatus('tepat_waktu')">
             <div class="card-body">
                 <i class="fas fa-check-circle fa-2x mb-2"></i>
                 <h3 class="mb-1">{{ $statistik['hadir'] }}</h3>
@@ -163,7 +170,7 @@
         </div>
     </div>
     <div class="col-12 col-sm-6 col-lg-3 mb-4">
-        <div class="card bg-warning text-white text-center">
+        <div class="card bg-warning text-white text-center" style="cursor: pointer;" onclick="showSiswaByStatus('terlambat')">
             <div class="card-body">
                 <i class="fas fa-clock fa-2x mb-2"></i>
                 <h3 class="mb-1">{{ $statistik['terlambat'] }}</h3>
@@ -172,7 +179,7 @@
         </div>
     </div>
     <div class="col-12 col-sm-6 col-lg-3 mb-4">
-        <div class="card bg-danger text-white text-center">
+        <div class="card bg-danger text-white text-center" style="cursor: pointer;" onclick="showSiswaByStatus('absen')">
             <div class="card-body">
                 <i class="fas fa-times-circle fa-2x mb-2"></i>
                 <h3 class="mb-1">{{ $statistik['absen'] }}</h3>
@@ -181,7 +188,7 @@
         </div>
     </div>
     <div class="col-12 col-sm-6 col-lg-3 mb-4">
-        <div class="card bg-secondary text-white text-center">
+        <div class="card bg-secondary text-white text-center" style="cursor: pointer;" onclick="showSiswaByStatus('sakit')">
             <div class="card-body">
                 <i class="fas fa-user-injured fa-2x mb-2"></i>
                 <h3 class="mb-1">{{ $statistik['sakit'] ?? 0 }}</h3>
@@ -190,7 +197,7 @@
         </div>
     </div>
     <div class="col-12 col-sm-6 col-lg-3 mb-4">
-        <div class="card bg-info text-white text-center">
+        <div class="card bg-info text-white text-center" style="cursor: pointer;" onclick="showSiswaByStatus('izin')">
             <div class="card-body">
                 <i class="fas fa-user-check fa-2x mb-2"></i>
                 <h3 class="mb-1">{{ $statistik['izin'] ?? 0 }}</h3>
@@ -199,16 +206,16 @@
         </div>
     </div>
     <div class="col-12 col-sm-6 col-lg-3 mb-4">
-        <div class="card bg-secondary text-white text-center">
+        <div class="card bg-secondary text-white text-center" style="cursor: pointer;" onclick="showSiswaByStatus('alpa')">
             <div class="card-body">
                 <i class="fas fa-times-circle fa-2x mb-2"></i>
-                <h3 class="mb-1">{{ $statistik['alfa'] ?? 0 }}</h3>
-                <p class="mb-0">Alfa</p>
+                <h3 class="mb-1">{{ $statistik['alpa'] ?? 0 }}</h3>
+                <p class="mb-0">Alpa</p>
             </div>
         </div>
     </div>
     <div class="col-12 col-sm-6 col-lg-3 mb-4">
-        <div class="card bg-info text-white text-center">
+        <div class="card bg-info text-white text-center" style="cursor: pointer;" onclick="showSiswaByStatus('kehadiran')">
             <div class="card-body">
                 <i class="fas fa-percentage fa-2x mb-2"></i>
                 <h3 class="mb-1">
@@ -308,6 +315,47 @@
         </div>
     </div>
 </div>
+
+<!-- Modal Daftar Siswa -->
+<div class="modal fade" id="modalSiswa" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalSiswaTitle">Daftar Siswa</h5>
+                <button class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="loadingSiswa" class="text-center d-none">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="mt-2">Memuat data siswa...</p>
+                </div>
+                <div id="siswaList" class="d-none">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>No</th>
+                                    <th>Nama</th>
+                                    <th>NISN</th>
+                                    <th>Kelas</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="siswaTableBody">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div id="emptySiswa" class="text-center d-none">
+                    <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                    <p class="text-muted">Tidak ada data siswa untuk status ini</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 @endsection
 
 @push('scripts')
@@ -387,5 +435,83 @@ document.querySelectorAll('.btn-delete').forEach(btn => {
         new bootstrap.Modal(document.getElementById('modalDelete')).show();
     });
 });
+
+function showSiswaByStatus(status) {
+    const modalTitle = document.getElementById('modalSiswaTitle');
+    const loading = document.getElementById('loadingSiswa');
+    const siswaList = document.getElementById('siswaList');
+    const emptySiswa = document.getElementById('emptySiswa');
+    const siswaTableBody = document.getElementById('siswaTableBody');
+
+    // Mapping status untuk judul modal
+    const statusLabels = {
+        'tepat_waktu': 'Tepat Waktu',
+        'terlambat': 'Terlambat',
+        'absen': 'Absen',
+        'sakit': 'Sakit',
+        'izin': 'Izin',
+        'alpa': 'Alpa',
+        'kehadiran': 'Kehadiran'
+    };
+
+    modalTitle.textContent = `Daftar Siswa (Status: ${statusLabels[status] || status})`;
+    loading.classList.remove('d-none');
+    siswaList.classList.add('d-none');
+    emptySiswa.classList.add('d-none');
+    siswaTableBody.innerHTML = ''; // Clear previous data
+
+    fetch(`/guru/presensi/siswa-by-status/${status}`)
+        .then(res => {
+            if (!res.ok) {
+                throw new Error(`HTTP error! status: ${res.status}`);
+            }
+            return res.json();
+        })
+        .then(data => {
+            loading.classList.add('d-none');
+            
+            // Check if data has error property
+            if (data.error) {
+                throw new Error(data.error);
+            }
+            
+            if (data.length === 0) {
+                siswaList.classList.add('d-none');
+                emptySiswa.classList.remove('d-none');
+            } else {
+                siswaList.classList.remove('d-none');
+                emptySiswa.classList.add('d-none');
+                data.forEach((siswa, index) => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${index + 1}</td>
+                        <td>${siswa.nama}</td>
+                        <td>${siswa.nisn}</td>
+                        <td>${siswa.kelas}</td>
+                        <td><span class="badge bg-${getStatusBadgeColor(siswa.status)}">${siswa.status}</span></td>
+                    `;
+                    siswaTableBody.appendChild(row);
+                });
+            }
+            new bootstrap.Modal(document.getElementById('modalSiswa')).show();
+        })
+        .catch(error => {
+            console.error('Error fetching siswa by status:', error);
+            loading.classList.add('d-none');
+            alert('Gagal memuat data siswa: ' + error.message);
+        });
+}
+
+function getStatusBadgeColor(status) {
+    switch(status) {
+        case 'Tepat Waktu': return 'success';
+        case 'Terlambat': return 'warning';
+        case 'Tidak Hadir': return 'danger';
+        case 'Sakit': return 'secondary';
+        case 'Izin': return 'info';
+        case 'Alpa': return 'secondary';
+        default: return 'primary';
+    }
+}
 </script>
 @endpush

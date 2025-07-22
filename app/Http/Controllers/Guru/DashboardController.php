@@ -28,7 +28,7 @@ class DashboardController extends Controller
         $terlambat = $presensiHariIni->where('status', 'terlambat')->count();
         $sakit = $presensiHariIni->where('status', 'sakit')->count();
         $izin = $presensiHariIni->where('status', 'izin')->count();
-        $alfa = $presensiHariIni->where('status', 'alfa')->count();
+        $alpa = $presensiHariIni->where('status', 'alpa')->count();
         $absen = $totalSiswa - $hadir - $terlambat - $sakit - $izin;
         $statistik = [
             'total_siswa' => $totalSiswa,
@@ -37,7 +37,7 @@ class DashboardController extends Controller
             'absen' => $absen,
             'sakit' => $sakit,
             'izin' => $izin,
-            'alfa' => $alfa,
+            'alpa' => $alpa,
         ];
         $guru = \App\Models\Guru::where('email', auth()->user()->email)->first();
         $jamMasuk = \App\Models\JamMasuk::first();
@@ -94,7 +94,7 @@ class DashboardController extends Controller
                 'terlambat' => 0,
                 'sakit' => 0,
                 'izin' => 0,
-                'alfa' => 0
+                'alpa' => 0
             ]);
         }
 
@@ -141,7 +141,7 @@ class DashboardController extends Controller
         $terlambat = $presensis->where('status', 'terlambat')->count();
         $sakit = $presensis->where('status', 'sakit')->count();
         $izin = $presensis->where('status', 'izin')->count();
-        $alfa = $presensis->where('status', 'alfa')->count();
+        $alpa = $presensis->where('status', 'alpa')->count();
         
         return view('guru.laporan', compact(
             'guru',
@@ -155,7 +155,7 @@ class DashboardController extends Controller
             'terlambat',
             'sakit',
             'izin',
-            'alfa'
+            'alpa'
         ));
     }
 

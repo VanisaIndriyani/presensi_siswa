@@ -61,7 +61,7 @@ class LaporanController extends Controller
         $terlambat = $presensis->where('status', 'terlambat')->count();
         $sakit = $presensis->where('status', 'sakit')->count();
         $izin = $presensis->where('status', 'izin')->count();
-        $alfa = $presensis->where('status', 'alfa')->count();
+        $alpa = $presensis->where('status', 'alpa')->count();
         
         return view('admin.laporan.index', compact(
             'presensis', 
@@ -76,7 +76,7 @@ class LaporanController extends Controller
             'terlambat',
             'sakit',
             'izin',
-            'alfa'
+            'alpa'
         ));
     }
 

@@ -123,8 +123,8 @@
                                     <span class="badge bg-warning text-dark">Sakit</span>
                                 @elseif($p->status == 'izin')
                                     <span class="badge bg-info text-dark">Izin</span>
-                                @elseif($p->status == 'alfa')
-                                    <span class="badge bg-secondary">Alfa</span>
+                                @elseif($p->status == 'alpa')
+<span class="badge bg-secondary">Alpa</span>
                                 @endif
                             </td>
                             <td>
@@ -139,7 +139,7 @@
                                     {{ $p->keterangan ?? '-' }}
                                 @elseif($p->status === 'sakit')
                                     Izin sakit, surat diserahkan ke TU
-                                @elseif($p->status === 'alfa')
+                                @elseif($p->status === 'alpa')
                                     Tidak hadir tanpa keterangan
                                 @else
                                     {{ $p->keterangan ?? '-' }}
@@ -354,7 +354,7 @@ function fetchPresensi() {
                         <td>${p.kelas}</td>
                         <td>${p.waktu_scan}</td>
                         <td>${p.jam_pulang ? p.jam_pulang : '-'}</td>
-                        <td>${p.status === 'tepat_waktu' ? '<span class=\'badge bg-success\'>Tepat Waktu</span>' : (p.status === 'terlambat' ? '<span class=\'badge bg-danger\'>Terlambat</span>' : (p.status === 'sakit' ? '<span class=\'badge bg-warning text-dark\'>Sakit</span>' : (p.status === 'izin' ? '<span class=\'badge bg-info text-dark\'>Izin</span>' : (p.status === 'alfa' ? '<span class=\'badge bg-secondary\'>Alfa</span>' : '')))}</td>
+                        <td>${p.status === 'tepat_waktu' ? '<span class=\'badge bg-success\'>Tepat Waktu</span>' : (p.status === 'terlambat' ? '<span class=\'badge bg-danger\'>Terlambat</span>' : (p.status === 'sakit' ? '<span class=\'badge bg-warning text-dark\'>Sakit</span>' : (p.status === 'izin' ? '<span class=\'badge bg-info text-dark\'>Izin</span>' : (p.status === 'alpa' ? '<span class=\'badge bg-secondary\'>Alpa</span>' : '')))}</td>
                         <td>${(p.status === 'tepat_waktu' && (!p.keterangan || p.keterangan === '')) ? 'Tepat waktu masuk sekolah' : (p.keterangan ?? '')}</td>
                         <td class="text-center">
                             <div class="aksi-btn-group">

@@ -94,15 +94,6 @@
 @endif
 <div class="qr-container" @if($isLibur) style="pointer-events:none;opacity:0.5;" @endif>
     <div class="qr-title">Pemindai QR Presensi Siswa</div>
-    <div class="mb-3">
-        <label for="selectKelas" class="form-label">Pilih Kelas</label>
-        <select id="selectKelas" class="form-select select-kelas">
-            <option value="">-- Pilih Kelas --</option>
-            @foreach($kelasList as $kelas)
-                <option value="{{ $kelas }}">{{ $kelas }}</option>
-            @endforeach
-        </select>
-    </div>
     <div id="qr-reader"></div>
     <div id="scan-result" class="scan-result"></div>
     <div id="scan-error" class="scan-error"></div>
@@ -174,23 +165,15 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function onScanSuccess(decodedText, decodedResult) {
         if (decodedText === lastScanned) return;
-
-        const selectedKelas = document.getElementById('selectKelas').value;
-        if (!selectedKelas) {
-            showResult('Pilih kelas terlebih dahulu', true);
-            return;
-        }
-
         lastScanned = decodedText;
         showResult('Memproses presensi...', false, true);
-
         fetch('{{ url('guru/presensi/scan-qr') }}', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'X-CSRF-TOKEN': csrfToken
             },
-            body: JSON.stringify({ qr: decodedText, kelas: selectedKelas })
+            body: JSON.stringify({ qr: decodedText })
         })
         .then(res => res.json())
         .then(data => {

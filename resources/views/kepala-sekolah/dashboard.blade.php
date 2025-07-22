@@ -1,4 +1,4 @@
-@extends('layouts.admin')
+@extends('layouts.kepala-sekolah')
 
 @section('content')
 <style>
@@ -72,7 +72,7 @@
         font-weight: 500;
     }
 </style>
-<h1 class="page-title" style="font-size:2.2rem; margin-bottom:2rem;">Dashboard Admin</h1>
+<h1 class="page-title" style="font-size:2.2rem; margin-bottom:2rem;">Dashboard Kepala Sekolah</h1>
 <div class="dashboard-cards">
     <div class="stat-card" style="background: linear-gradient(135deg, #38bdf8 0%, #6366f1 100%);">
         <div class="stat-icon"><i class="fas fa-users"></i></div>
@@ -144,6 +144,7 @@
 const ctx = document.getElementById('kehadiranChart').getContext('2d');
 const kehadiranChart = new Chart(ctx, {
     type: 'bar',
+    animation: false,
     data: {
         labels: @json($labels),
         datasets: [
@@ -181,6 +182,7 @@ const kehadiranChart = new Chart(ctx, {
     },
     options: {
         responsive: true,
+        animation: false,
         plugins: {
             legend: { position: 'top' },
             title: { display: false }

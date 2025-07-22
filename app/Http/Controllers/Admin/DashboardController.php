@@ -20,7 +20,7 @@ class DashboardController extends Controller
             ->count();
         $sakitHariIni = Presensi::whereDate('tanggal', today())->where('status', 'sakit')->count();
         $izinHariIni = Presensi::whereDate('tanggal', today())->where('status', 'izin')->count();
-        $alfaHariIni = Presensi::whereDate('tanggal', today())->where('status', 'alfa')->count();
+        $alpaHariIni = Presensi::whereDate('tanggal', today())->where('status', 'alpa')->count();
 
         // Filter grafik
         $range = $request->input('range', '7hari');
@@ -30,7 +30,7 @@ class DashboardController extends Controller
         $absenData = [];
         $sakitData = [];
         $izinData = [];
-        $alfaData = [];
+        $alpaData = [];
 
         if ($range === 'minggu') {
             $start = Carbon::now()->startOfWeek();
@@ -43,13 +43,13 @@ class DashboardController extends Controller
                 $sakit = Presensi::whereDate('tanggal', $date->format('Y-m-d'))->where('status', 'sakit')->count();
                 $izin = Presensi::whereDate('tanggal', $date->format('Y-m-d'))->where('status', 'izin')->count();
                 $absen = $totalSiswa - $hadir - $terlambat - $sakit - $izin;
-                $alfa = Presensi::whereDate('tanggal', $date->format('Y-m-d'))->where('status', 'alfa')->count();
+                $alpa = Presensi::whereDate('tanggal', $date->format('Y-m-d'))->where('status', 'alpa')->count();
                 $hadirData[] = $hadir;
                 $terlambatData[] = $terlambat;
                 $sakitData[] = $sakit;
                 $izinData[] = $izin;
                 $absenData[] = $absen;
-                $alfaData[] = $alfa;
+                $alpaData[] = $alpa;
             }
         } elseif ($range === 'bulan') {
             $start = Carbon::now()->startOfMonth();
@@ -62,13 +62,13 @@ class DashboardController extends Controller
                 $sakit = Presensi::whereDate('tanggal', $date->format('Y-m-d'))->where('status', 'sakit')->count();
                 $izin = Presensi::whereDate('tanggal', $date->format('Y-m-d'))->where('status', 'izin')->count();
                 $absen = $totalSiswa - $hadir - $terlambat - $sakit - $izin;
-                $alfa = Presensi::whereDate('tanggal', $date->format('Y-m-d'))->where('status', 'alfa')->count();
+                $alpa = Presensi::whereDate('tanggal', $date->format('Y-m-d'))->where('status', 'alpa')->count();
                 $hadirData[] = $hadir;
                 $terlambatData[] = $terlambat;
                 $sakitData[] = $sakit;
                 $izinData[] = $izin;
                 $absenData[] = $absen;
-                $alfaData[] = $alfa;
+                $alpaData[] = $alpa;
             }
         } else {
             for ($i = 6; $i >= 0; $i--) {
@@ -79,13 +79,13 @@ class DashboardController extends Controller
                 $sakit = Presensi::whereDate('tanggal', $tanggal)->where('status', 'sakit')->count();
                 $izin = Presensi::whereDate('tanggal', $tanggal)->where('status', 'izin')->count();
                 $absen = $totalSiswa - $hadir - $terlambat - $sakit - $izin;
-                $alfa = Presensi::whereDate('tanggal', $tanggal)->where('status', 'alfa')->count();
+                $alpa = Presensi::whereDate('tanggal', $tanggal)->where('status', 'alpa')->count();
                 $hadirData[] = $hadir;
                 $terlambatData[] = $terlambat;
                 $sakitData[] = $sakit;
                 $izinData[] = $izin;
                 $absenData[] = $absen;
-                $alfaData[] = $alfa;
+                $alpaData[] = $alpa;
             }
         }
 
@@ -96,14 +96,14 @@ class DashboardController extends Controller
             'terlambatHariIni' => $terlambatHariIni,
             'sakitHariIni' => $sakitHariIni,
             'izinHariIni' => $izinHariIni,
-            'alfaHariIni' => $alfaHariIni,
+            'alpaHariIni' => $alpaHariIni,
             'labels' => $labels,
             'hadirData' => $hadirData,
             'terlambatData' => $terlambatData,
             'sakitData' => $sakitData,
             'izinData' => $izinData,
             'absenData' => $absenData,
-            'alfaData' => $alfaData,
+            'alpaData' => $alpaData,
             'range' => $range,
             'liburHariIni' => $liburHariIni,
         ]);

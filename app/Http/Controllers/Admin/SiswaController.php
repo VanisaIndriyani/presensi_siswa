@@ -23,7 +23,6 @@ class SiswaController extends Controller
             'kelas' => 'required',
             'qr_code' => 'nullable|unique:siswas,qr_code',
             'jenis_kelamin' => 'nullable',
-            'alamat' => 'nullable',
         ]);
         if (empty($validated['qr_code'])) {
             $validated['qr_code'] = uniqid('QR');
@@ -50,7 +49,6 @@ class SiswaController extends Controller
             'kelas' => 'required',
             'qr_code' => 'nullable|unique:siswas,qr_code,' . $siswa->id,
             'jenis_kelamin' => 'nullable',
-            'alamat' => 'nullable',
         ]);
         $siswa->update($validated);
         return redirect()->route('admin.siswa.index')->with('success', 'Siswa berhasil diupdate!');

@@ -126,8 +126,8 @@
     </div>
     <div class="col-md-2">
         <div class="stats-card text-center" style="background: linear-gradient(135deg, #9ca3af 0%, #6b7280 100%);">
-            <div class="stats-number">{{ $alfa }}</div>
-            <div class="stats-label">Alfa</div>
+                            <div class="stats-number">{{ $alpa }}</div>
+                <div class="stats-label">Alpa</div>
         </div>
     </div>
 </div>
@@ -179,8 +179,8 @@
                                     <span class="badge bg-warning text-dark">Sakit</span>
                                 @elseif($p->status == 'izin')
                                     <span class="badge bg-info text-dark">Izin</span>
-                                @elseif($p->status == 'alfa')
-                                    <span class="badge bg-secondary">Alfa</span>
+                                @elseif($p->status == 'alpa')
+<span class="badge bg-secondary">Alpa</span>
                                 @else
                                     <span class="badge bg-secondary">{{ ucfirst($p->status) }}</span>
                                 @endif
@@ -197,7 +197,7 @@
                                     {{ $p->keterangan ?? '-' }}
                                 @elseif($p->status === 'sakit')
                                     Izin sakit, surat diserahkan ke TU
-                                @elseif($p->status === 'alfa')
+                                @elseif($p->status === 'alpa')
                                     Tidak hadir tanpa keterangan
                                 @else
                                     {{ $p->keterangan ?? '-' }}

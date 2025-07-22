@@ -122,8 +122,8 @@
                                                     <span class="badge bg-info text-white"><i class="fas fa-info-circle me-1"></i>Izin</span>
                                                 @elseif($presensi->status === 'sakit')
                                                     <span class="badge bg-danger"><i class="fas fa-medkit me-1"></i>Sakit</span>
-                                                @elseif($presensi->status === 'alfa')
-                                                    <span class="badge bg-secondary"><i class="fas fa-times me-1"></i>Alfa</span>
+                                                @elseif($presensi->status === 'alpa')
+<span class="badge bg-secondary"><i class="fas fa-times me-1"></i>Alpa</span>
                                                 @endif
                                             </td>
                                             <td>
@@ -138,7 +138,7 @@
                                                     {{ $presensi->keterangan ?? '-' }}
                                                 @elseif($presensi->status === 'sakit')
                                                     Izin sakit, surat diserahkan ke TU
-                                                @elseif($presensi->status === 'alfa')
+                                                @elseif($presensi->status === 'alpa')
                                                     Tidak hadir tanpa keterangan
                                                 @else
                                                     {{ $presensi->keterangan ?? '-' }}

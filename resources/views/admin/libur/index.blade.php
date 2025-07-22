@@ -36,7 +36,7 @@
     }
 </style>
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <h1 class="h3 mb-0 page-title">Hari Libur & Pengaturan Jam Masuk</h1>
+    <h1 class="h3 mb-0 page-title">Pengaturan Waktu & Hari Libur</h1>
     <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalTambah">+ Tambah Hari Libur</button>
 </div>
 

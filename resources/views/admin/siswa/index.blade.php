@@ -55,11 +55,42 @@
         color: #7C3AED !important; /* Ungu untuk label */
         font-weight: 500;
     }
+    
+    /* Search box styling */
+    #searchInput {
+        border-color: #e5e7eb;
+        border-radius: 8px 0 0 8px;
+    }
+    
+    #searchInput:focus {
+        border-color: #7C3AED;
+        box-shadow: 0 0 0 0.2rem rgba(124, 58, 237, 0.25);
+    }
+    
+    #searchBtn {
+        border-color: #e5e7eb;
+        border-radius: 0 8px 8px 0;
+        border-left: none;
+    }
+    
+    #searchBtn:hover {
+        background-color: #7C3AED;
+        border-color: #7C3AED;
+        color: white;
+    }
 </style>
 
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h1 class="h3 mb-0 page-title">Daftar Siswa</h1>
-    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalTambah">+ Tambah Siswa</button>
+    <div class="d-flex gap-2">
+        <div class="input-group" style="width: 300px;">
+            <input type="text" id="searchInput" class="form-control" placeholder="Cari siswa...">
+            <button class="btn btn-outline-secondary" type="button" id="searchBtn">
+                <i class="fas fa-search"></i>
+            </button>
+        </div>
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalTambah">+ Tambah Siswa</button>
+    </div>
 </div>
 
 @if(session('success'))
@@ -76,14 +107,14 @@
                         <th>Nama</th>
                         <th>NISN</th>
                         <th>Kelas</th>
-           
+                        <th>Jenis Kelamin</th>
                         <th class="text-center">Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
                     @forelse($siswas as $kelas => $list)
                         <tr>
-                            <td colspan="5" class="bg-light fw-bold">Kelas {{ $kelas }}</td>
+                            <td colspan="6" class="bg-light fw-bold">Kelas {{ $kelas }}</td>
                         </tr>
                         @foreach($list as $i => $siswa)
                             <tr>
@@ -91,6 +122,7 @@
                                 <td>{{ $siswa->nama }}</td>
                                 <td>{{ $siswa->nisn }}</td>
                                 <td>{{ $siswa->kelas }}</td>
+                                <td>{{ $siswa->jenis_kelamin ?? '-' }}</td>
                                 <td class="text-center">
                                     <button class="aksi-btn info btn-show" data-id="{{ $siswa->id }}" title="Lihat">
                                         <i class="fas fa-eye"></i>
@@ -109,7 +141,7 @@
                         @endforeach
                     @empty
                         <tr>
-                            <td colspan="5" class="text-center text-muted">Belum ada data siswa.</td>
+                            <td colspan="6" class="text-center text-muted">Belum ada data siswa.</td>
                         </tr>
                     @endforelse
                 </tbody>
@@ -148,10 +180,7 @@
             <option value="Perempuan">Perempuan</option>
           </select>
         </div>
-        <div class="mb-3">
-          <label class="form-label">Alamat</label>
-          <input type="text" name="alamat" class="form-control">
-        </div>
+
        
       </div>
       <div class="modal-footer">
@@ -194,10 +223,7 @@
             <option value="Perempuan">Perempuan</option>
           </select>
         </div>
-        <div class="mb-3">
-          <label class="form-label">Alamat</label>
-          <input type="text" name="alamat" id="edit-alamat" class="form-control">
-        </div>
+
        
       </div>
       <div class="modal-footer">
@@ -222,7 +248,7 @@
           <li class="list-group-item"><b>NISN:</b> <span id="show-nisn"></span></li>
           <li class="list-group-item"><b>Kelas:</b> <span id="show-kelas"></span></li>
           <li class="list-group-item"><b>Jenis Kelamin:</b> <span id="show-jenis_kelamin"></span></li>
-          <li class="list-group-item"><b>Alamat:</b> <span id="show-alamat"></span></li>
+
         </ul>
       </div>
       <div class="modal-footer">
@@ -266,7 +292,7 @@ showBtns.forEach(btn => {
                 document.getElementById('show-nisn').textContent = data.nisn;
                 document.getElementById('show-kelas').textContent = data.kelas;
                 document.getElementById('show-jenis_kelamin').textContent = data.jenis_kelamin || '-';
-                document.getElementById('show-alamat').textContent = data.alamat || '-';
+
                 new bootstrap.Modal(document.getElementById('modalShow')).show();
             });
     });
@@ -283,7 +309,7 @@ editBtns.forEach(btn => {
                 document.getElementById('edit-nisn').value = data.nisn;
                 document.getElementById('edit-kelas').value = data.kelas;
                 document.getElementById('edit-jenis_kelamin').value = data.jenis_kelamin || '';
-                document.getElementById('edit-alamat').value = data.alamat || '';
+
                 document.getElementById('formEdit').action = `${baseUrl}/${data.id}`;
                 new bootstrap.Modal(document.getElementById('modalEdit')).show();
             });
@@ -297,6 +323,74 @@ hapusBtns.forEach(btn => {
         document.getElementById('formHapus').action = `${baseUrl}/${btn.dataset.id}`;
         new bootstrap.Modal(document.getElementById('modalHapus')).show();
     });
+});
+
+// Search functionality
+const searchInput = document.getElementById('searchInput');
+const searchBtn = document.getElementById('searchBtn');
+const tableRows = document.querySelectorAll('tbody tr');
+
+function performSearch() {
+    const searchTerm = searchInput.value.toLowerCase().trim();
+    
+    tableRows.forEach(row => {
+        const nama = row.querySelector('td:nth-child(2)')?.textContent.toLowerCase() || '';
+        const nisn = row.querySelector('td:nth-child(3)')?.textContent.toLowerCase() || '';
+        const kelas = row.querySelector('td:nth-child(4)')?.textContent.toLowerCase() || '';
+        
+        // Skip header rows (kelas headers)
+        if (row.querySelector('td[colspan]')) {
+            return;
+        }
+        
+        if (nama.includes(searchTerm) || nisn.includes(searchTerm) || kelas.includes(searchTerm)) {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
+        }
+    });
+    
+    // Show/hide kelas headers based on visible rows
+    const kelasHeaders = document.querySelectorAll('tbody tr td[colspan]');
+    kelasHeaders.forEach(header => {
+        const nextRows = [];
+        let currentRow = header.parentElement.nextElementSibling;
+        
+        // Find all rows until next header or end
+        while (currentRow && !currentRow.querySelector('td[colspan]')) {
+            if (currentRow.style.display !== 'none') {
+                nextRows.push(currentRow);
+            }
+            currentRow = currentRow.nextElementSibling;
+        }
+        
+        // Show header only if there are visible rows in this kelas
+        if (nextRows.length > 0) {
+            header.parentElement.style.display = '';
+        } else {
+            header.parentElement.style.display = 'none';
+        }
+    });
+}
+
+// Search on button click
+searchBtn.addEventListener('click', performSearch);
+
+// Search on Enter key
+searchInput.addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+        performSearch();
+    }
+});
+
+// Clear search on input change (optional - remove if you want manual search only)
+searchInput.addEventListener('input', function() {
+    if (this.value === '') {
+        // Show all rows when search is cleared
+        tableRows.forEach(row => {
+            row.style.display = '';
+        });
+    }
 });
 </script>
 @endsection 

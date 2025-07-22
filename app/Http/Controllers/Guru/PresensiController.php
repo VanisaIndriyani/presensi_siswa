@@ -40,7 +40,7 @@ class PresensiController extends Controller
             'siswa_id' => 'required|exists:siswas,id',
             'tanggal' => 'required|date',
             'waktu_scan' => 'required',
-            'status' => 'required|in:tepat_waktu,terlambat,izin,sakit,alfa',
+            'status' => 'required|in:tepat_waktu,terlambat,izin,sakit,alpa',
             'keterangan' => 'nullable|string',
         ]);
 
@@ -54,7 +54,7 @@ class PresensiController extends Controller
             $keterangan = 'Terlambat masuk sekolah';
         } elseif ($validated['status'] === 'sakit') {
             $keterangan = 'Sakit, surat diserahkan ke TU';
-        } elseif ($validated['status'] === 'alfa') {
+        } elseif ($validated['status'] === 'alpa') {
             $keterangan = null;
         }
         Presensi::create([
@@ -83,7 +83,7 @@ class PresensiController extends Controller
     public function update(Request $request, Presensi $presensi)
     {
         $validated = $request->validate([
-            'status' => 'required|in:tepat_waktu,terlambat,izin,sakit,alfa',
+            'status' => 'required|in:tepat_waktu,terlambat,izin,sakit,alpa',
             'keterangan' => 'nullable|string',
         ]);
 
@@ -94,7 +94,7 @@ class PresensiController extends Controller
             $keterangan = 'Terlambat masuk sekolah';
         } elseif ($validated['status'] === 'sakit') {
             $keterangan = 'Sakit, surat diserahkan ke TU';
-        } elseif ($validated['status'] === 'alfa') {
+        } elseif ($validated['status'] === 'alpa') {
             $keterangan = null;
         }
         $presensi->update([
@@ -114,7 +114,6 @@ class PresensiController extends Controller
     {
         $request->validate([
             'qr' => 'required|string',
-            'kelas' => 'required|string',
         ]);
 
         // Cari siswa berdasarkan NISN (karena QR code berisi NISN)
@@ -124,14 +123,6 @@ class PresensiController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'QR Code tidak valid atau siswa tidak ditemukan!'
-            ]);
-        }
-
-        // Cek apakah siswa dari kelas yang dipilih
-        if ($siswa->kelas !== $request->kelas) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Siswa tidak termasuk dalam kelas yang dipilih!'
             ]);
         }
 
@@ -224,4 +215,66 @@ class PresensiController extends Controller
 
         return response()->json($data);
     }
+
+    public function getSiswaByStatus($status)
+    {
+        try {
+            $today = today()->toDateString();
+            
+            if ($status === 'kehadiran') {
+                // Untuk kehadiran, ambil semua yang hadir (tepat_waktu + terlambat)
+                $presensis = Presensi::with('siswa')
+                    ->whereDate('tanggal', $today)
+                    ->whereIn('status', ['tepat_waktu', 'terlambat'])
+                    ->get();
+            } elseif ($status === 'absen') {
+                // Untuk absen, ambil siswa yang tidak ada presensi hari ini
+                $siswaHadir = Presensi::whereDate('tanggal', $today)->pluck('siswa_id');
+                $siswas = Siswa::whereNotIn('id', $siswaHadir)->get();
+                
+                $data = [];
+                foreach ($siswas as $siswa) {
+                    $data[] = [
+                        'nama' => $siswa->nama,
+                        'nisn' => $siswa->nisn,
+                        'kelas' => $siswa->kelas,
+                        'status' => 'Tidak Hadir'
+                    ];
+                }
+                
+                return response()->json($data);
+            } else {
+                // Untuk status lainnya (tepat_waktu, terlambat, sakit, izin, alpa)
+                $presensis = Presensi::with('siswa')
+                    ->whereDate('tanggal', $today)
+                    ->where('status', $status)
+                    ->get();
+            }
+
+            $data = [];
+            foreach ($presensis as $p) {
+                $statusText = match($p->status) {
+                    'tepat_waktu' => 'Tepat Waktu',
+                    'terlambat' => 'Terlambat',
+                    'sakit' => 'Sakit',
+                    'izin' => 'Izin',
+                    'alpa' => 'Alpa',
+                    default => ucfirst($p->status)
+                };
+                
+                $data[] = [
+                    'nama' => $p->siswa ? $p->siswa->nama : '-',
+                    'nisn' => $p->siswa ? $p->siswa->nisn : '-',
+                    'kelas' => $p->siswa ? $p->siswa->kelas : '-',
+                    'status' => $statusText
+                ];
+            }
+
+            return response()->json($data);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Terjadi kesalahan: ' . $e->getMessage()], 500);
+        }
+    }
+
+
 } 

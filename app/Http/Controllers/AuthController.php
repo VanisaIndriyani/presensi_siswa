@@ -29,6 +29,8 @@ class AuthController extends Controller
                 return redirect()->intended('/admin');
             } elseif ($user->role === 'guru') {
                 return redirect()->intended('/guru');
+            } elseif ($user->role === 'kepala_sekolah') {
+                return redirect()->intended('/kepala-sekolah');
             } else {
                 return redirect()->intended('/siswa');
             }
