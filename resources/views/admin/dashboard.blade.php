@@ -83,14 +83,7 @@
     }
 </style>
 <h1 class="page-title" style="font-size:2.2rem; margin-bottom:2rem;">Dashboard Admin</h1>
-<div class="dashboard-cards">
-    <div class="stat-card" style="background: linear-gradient(135deg, #38bdf8 0%, #6366f1 100%);">
-        <div class="stat-icon"><i class="fas fa-users"></i></div>
-        <div class="stat-info">
-            <div class="stat-label">Total Siswa</div>
-            <div class="stat-value">{{ $totalSiswa ?? 0 }}</div>
-        </div>
-    </div>
+
     <div class="stat-card clickable" style="background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);" onclick="showSiswaByStatus('tepat_waktu')">
         <div class="stat-icon"><i class="fas fa-user-check"></i></div>
         <div class="stat-info">

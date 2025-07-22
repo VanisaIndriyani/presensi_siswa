@@ -72,6 +72,23 @@
         font-weight: 500;
     }
     
+    /* Notification Bell Animation */
+    .notification-bell {
+        animation: bellRing 2s infinite;
+        transition: all 0.3s ease;
+    }
+    
+    .notification-bell:hover {
+        transform: scale(1.1);
+        animation: bellRing 0.5s infinite;
+    }
+    
+    @keyframes bellRing {
+        0%, 100% { transform: rotate(0deg); }
+        10%, 30%, 50%, 70%, 90% { transform: rotate(5deg); }
+        20%, 40%, 60%, 80% { transform: rotate(-5deg); }
+    }
+    
     /* Notification Bell Styles */
     .notification-bell {
         position: fixed;
@@ -193,84 +210,104 @@
     @endphp
     
     @if($alpaHariIni >= 5 || $persentaseAlpa >= 10)
-        <div class="alert alert-danger mb-3" style="border-radius: 12px; border-left: 4px solid #dc3545;">
-            <div class="d-flex align-items-center">
-                <i class="fas fa-exclamation-triangle me-3" style="font-size: 1.5rem;"></i>
-                <div>
-                    <h6 class="alert-heading mb-1">
-                        <i class="fas fa-bell me-2"></i>Peringatan Tingkat Ketidakhadiran Tinggi!
-                    </h6>
-                    <p class="mb-1">
-                        <strong>{{ $alpaHariIni }} siswa</strong> tidak hadir hari ini 
-                        @if($totalSiswaHariIni > 0)
-                            ({{ $persentaseAlpa }}% dari total kehadiran hari ini)
-                        @endif
-                    </p>
-                    <small class="text-muted">
-                        <i class="fas fa-info-circle me-1"></i>
-                        Perlu tindakan segera untuk mengecek dan menindaklanjuti ketidakhadiran siswa.
-                    </small>
+        <div class="alert alert-danger mb-3" style="border-radius: 12px; border-left: 4px solid #dc3545; position: relative;">
+            <div class="d-flex align-items-center justify-content-between">
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-exclamation-triangle me-3" style="font-size: 1.5rem;"></i>
+                    <div>
+                        <h6 class="alert-heading mb-1">
+                            Peringatan Tingkat Ketidakhadiran Tinggi!
+                        </h6>
+                        <p class="mb-1">
+                            <strong>{{ $alpaHariIni }} siswa</strong> tidak hadir hari ini 
+                            @if($totalSiswaHariIni > 0)
+                                ({{ $persentaseAlpa }}% dari total kehadiran hari ini)
+                            @endif
+                        </p>
+                        <small class="text-muted">
+                            <i class="fas fa-info-circle me-1"></i>
+                            Perlu tindakan segera untuk mengecek dan menindaklanjuti ketidakhadiran siswa.
+                        </small>
+                    </div>
+                </div>
+                <div class="notification-bell" style="position: absolute; top: 15px; right: 15px;">
+                    <i class="fas fa-bell" style="font-size: 1.2rem; color: #dc3545;"></i>
                 </div>
             </div>
         </div>
     @elseif($alpaHariIni >= 3)
-        <div class="alert alert-warning mb-3" style="border-radius: 12px; border-left: 4px solid #ffc107;">
-            <div class="d-flex align-items-center">
-                <i class="fas fa-exclamation-circle me-3" style="font-size: 1.5rem;"></i>
-                <div>
-                    <h6 class="alert-heading mb-1">
-                        <i class="fas fa-eye me-2"></i>Perhatian: Ketidakhadiran Siswa
-                    </h6>
-                    <p class="mb-1">
-                        <strong>{{ $alpaHariIni }} siswa</strong> tidak hadir hari ini
-                        @if($totalSiswaHariIni > 0)
-                            ({{ $persentaseAlpa }}% dari total kehadiran hari ini)
-                        @endif
-                    </p>
-                    <small class="text-muted">
-                        <i class="fas fa-info-circle me-1"></i>
-                        Disarankan untuk memantau dan mengecek alasan ketidakhadiran.
-                    </small>
+        <div class="alert alert-warning mb-3" style="border-radius: 12px; border-left: 4px solid #ffc107; position: relative;">
+            <div class="d-flex align-items-center justify-content-between">
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-exclamation-circle me-3" style="font-size: 1.5rem;"></i>
+                    <div>
+                        <h6 class="alert-heading mb-1">
+                            Perhatian: Ketidakhadiran Siswa
+                        </h6>
+                        <p class="mb-1">
+                            <strong>{{ $alpaHariIni }} siswa</strong> tidak hadir hari ini
+                            @if($totalSiswaHariIni > 0)
+                                ({{ $persentaseAlpa }}% dari total kehadiran hari ini)
+                            @endif
+                        </p>
+                        <small class="text-muted">
+                            <i class="fas fa-info-circle me-1"></i>
+                            Disarankan untuk memantau dan mengecek alasan ketidakhadiran.
+                        </small>
+                    </div>
+                </div>
+                <div class="notification-bell" style="position: absolute; top: 15px; right: 15px;">
+                    <i class="fas fa-bell" style="font-size: 1.2rem; color: #ffc107;"></i>
                 </div>
             </div>
         </div>
     @else
-        <div class="alert alert-success mb-3" style="border-radius: 12px; border-left: 4px solid #198754;">
-            <div class="d-flex align-items-center">
-                <i class="fas fa-check-circle me-3" style="font-size: 1.5rem;"></i>
-                <div>
-                    <h6 class="alert-heading mb-1">
-                        <i class="fas fa-thumbs-up me-2"></i>Kehadiran Siswa Baik
-                    </h6>
-                    <p class="mb-1">
-                        Hanya <strong>{{ $alpaHariIni }} siswa</strong> yang tidak hadir hari ini
-                        @if($totalSiswaHariIni > 0)
-                            ({{ $persentaseAlpa }}% dari total kehadiran hari ini)
-                        @endif
-                    </p>
-                    <small class="text-muted">
-                        <i class="fas fa-info-circle me-1"></i>
-                        Tingkat kehadiran siswa dalam kondisi baik.
-                    </small>
+        <div class="alert alert-success mb-3" style="border-radius: 12px; border-left: 4px solid #198754; position: relative;">
+            <div class="d-flex align-items-center justify-content-between">
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-check-circle me-3" style="font-size: 1.5rem;"></i>
+                    <div>
+                        <h6 class="alert-heading mb-1">
+                            Kehadiran Siswa Baik
+                        </h6>
+                        <p class="mb-1">
+                            Hanya <strong>{{ $alpaHariIni }} siswa</strong> yang tidak hadir hari ini
+                            @if($totalSiswaHariIni > 0)
+                                ({{ $persentaseAlpa }}% dari total kehadiran hari ini)
+                            @endif
+                        </p>
+                        <small class="text-muted">
+                            <i class="fas fa-info-circle me-1"></i>
+                            Tingkat kehadiran siswa dalam kondisi baik.
+                        </small>
+                    </div>
+                </div>
+                <div class="notification-bell" style="position: absolute; top: 15px; right: 15px;">
+                    <i class="fas fa-bell" style="font-size: 1.2rem; color: #198754;"></i>
                 </div>
             </div>
-                 </div>
+        </div>
      @endif
      @else
-         <div class="alert alert-success mb-3" style="border-radius: 12px; border-left: 4px solid #198754;">
-             <div class="d-flex align-items-center">
-                 <i class="fas fa-star me-3" style="font-size: 1.5rem;"></i>
-                 <div>
-                     <h6 class="alert-heading mb-1">
-                         <i class="fas fa-trophy me-2"></i>Kehadiran Sempurna!
-                     </h6>
-                     <p class="mb-1">
-                         <strong>Tidak ada siswa yang alpa</strong> hari ini
-                     </p>
-                     <small class="text-muted">
-                         <i class="fas fa-info-circle me-1"></i>
-                         Semua siswa hadir atau memberikan keterangan yang valid.
-                     </small>
+         <div class="alert alert-success mb-3" style="border-radius: 12px; border-left: 4px solid #198754; position: relative;">
+             <div class="d-flex align-items-center justify-content-between">
+                 <div class="d-flex align-items-center">
+                     <i class="fas fa-star me-3" style="font-size: 1.5rem;"></i>
+                     <div>
+                         <h6 class="alert-heading mb-1">
+                             Kehadiran Sempurna!
+                         </h6>
+                         <p class="mb-1">
+                             <strong>Tidak ada siswa yang alpa</strong> hari ini
+                         </p>
+                         <small class="text-muted">
+                             <i class="fas fa-info-circle me-1"></i>
+                             Semua siswa hadir atau memberikan keterangan yang valid.
+                         </small>
+                     </div>
+                 </div>
+                 <div class="notification-bell" style="position: absolute; top: 15px; right: 15px;">
+                     <i class="fas fa-bell" style="font-size: 1.2rem; color: #198754;"></i>
                  </div>
              </div>
          </div>
