@@ -72,23 +72,6 @@
         font-weight: 500;
     }
     
-    /* Notification Bell Animation */
-    .notification-bell {
-        animation: bellRing 2s infinite;
-        transition: all 0.3s ease;
-    }
-    
-    .notification-bell:hover {
-        transform: scale(1.1);
-        animation: bellRing 0.5s infinite;
-    }
-    
-    @keyframes bellRing {
-        0%, 100% { transform: rotate(0deg); }
-        10%, 30%, 50%, 70%, 90% { transform: rotate(5deg); }
-        20%, 40%, 60%, 80% { transform: rotate(-5deg); }
-    }
-    
     /* Notification Bell Styles */
     .notification-bell {
         position: fixed;
@@ -289,25 +272,20 @@
         </div>
      @endif
      @else
-         <div class="alert alert-success mb-3" style="border-radius: 12px; border-left: 4px solid #198754; position: relative;">
-             <div class="d-flex align-items-center justify-content-between">
-                 <div class="d-flex align-items-center">
-                     <i class="fas fa-star me-3" style="font-size: 1.5rem;"></i>
-                     <div>
-                         <h6 class="alert-heading mb-1">
-                             Kehadiran Sempurna!
-                         </h6>
-                         <p class="mb-1">
-                             <strong>Tidak ada siswa yang alpa</strong> hari ini
-                         </p>
-                         <small class="text-muted">
-                             <i class="fas fa-info-circle me-1"></i>
-                             Semua siswa hadir atau memberikan keterangan yang valid.
-                         </small>
-                     </div>
-                 </div>
-                 <div class="notification-bell" style="position: absolute; top: 15px; right: 15px;">
-                     <i class="fas fa-bell" style="font-size: 1.2rem; color: #198754;"></i>
+         <div class="alert alert-success mb-3" style="border-radius: 12px; border-left: 4px solid #198754;">
+             <div class="d-flex align-items-center">
+                 <i class="fas fa-star me-3" style="font-size: 1.5rem;"></i>
+                 <div>
+                     <h6 class="alert-heading mb-1">
+                         <i class="fas fa-trophy me-2"></i>Kehadiran Sempurna!
+                     </h6>
+                     <p class="mb-1">
+                         <strong>Tidak ada siswa yang alpa</strong> hari ini
+                     </p>
+                     <small class="text-muted">
+                         <i class="fas fa-info-circle me-1"></i>
+                         Semua siswa hadir atau memberikan keterangan yang valid.
+                     </small>
                  </div>
              </div>
          </div>
