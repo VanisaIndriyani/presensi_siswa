@@ -127,6 +127,7 @@ class PresensiController extends Controller
         }
 
         $jamMasuk = JamMasuk::first();
+        $start = $jamMasuk ? $jamMasuk->start_time : '07:00';
         $end = $jamMasuk ? $jamMasuk->end_time : '08:30';
         $isLibur = \App\Models\Libur::where('tanggal', today())->exists();
         
@@ -143,13 +144,15 @@ class PresensiController extends Controller
 
         // Jika belum presensi masuk, lakukan presensi masuk
         if (!$presensi) {
-            if ($now->format('H:i') > $end) {
+            // Cek apakah sudah waktunya untuk presensi (setelah jam mulai)
+            if ($now->format('H:i') < $start) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Presensi sudah ditutup!'
+                    'message' => 'Presensi belum dibuka! Presensi dibuka mulai jam ' . $start
                 ]);
             }
             
+            // Tentukan status berdasarkan waktu
             $status = ($now->format('H:i') <= $end) ? 'tepat_waktu' : 'terlambat';
             Presensi::create([
                 'siswa_id' => $siswa->id,
@@ -162,7 +165,7 @@ class PresensiController extends Controller
             return response()->json([
                 'success' => true,
                 'nama' => $siswa->nama,
-                'message' => 'Presensi masuk berhasil!'
+                'message' => 'Presensi masuk berhasil! Status: ' . ($status === 'tepat_waktu' ? 'Tepat Waktu' : 'Terlambat')
             ]);
         } else {
             // Sudah presensi masuk, cek apakah sudah presensi pulang

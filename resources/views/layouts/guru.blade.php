@@ -16,7 +16,7 @@
         
         /* Sidebar Styles */
         .sidebar {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #059669 0%, #10b981 100%);
             color: white;
             min-height: 100vh;
             position: fixed;
@@ -82,12 +82,14 @@
         /* Mobile Header */
         .mobile-header {
             display: none;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #059669 0%, #10b981 100%);
             color: white;
             padding: 1rem;
             position: sticky;
             top: 0;
             z-index: 1001;
+            justify-content: space-between;
+            align-items: center;
         }
         
         .navbar-toggle {

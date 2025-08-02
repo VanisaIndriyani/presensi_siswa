@@ -10,7 +10,7 @@
     <style>
         .sidebar {
             min-height: 100vh;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%);
             position: fixed;
             top: 0;
             left: 0;
@@ -94,12 +94,14 @@
         
         .mobile-header {
             display: none;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%);
             color: white;
             padding: 1rem;
             position: sticky;
             top: 0;
             z-index: 1001;
+            justify-content: space-between;
+            align-items: center;
         }
         
         /* Responsive Design */

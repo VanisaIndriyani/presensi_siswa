@@ -24,6 +24,12 @@ Route::get('/login', [App\Http\Controllers\AuthController::class, 'showLoginForm
 Route::post('/login', [App\Http\Controllers\AuthController::class, 'login']);
 Route::post('/logout', [App\Http\Controllers\AuthController::class, 'logout'])->name('logout');
 
+// Password Reset Routes
+Route::get('/forgot-password', [App\Http\Controllers\PasswordResetController::class, 'showForgotPasswordForm'])->name('password.request');
+Route::post('/forgot-password', [App\Http\Controllers\PasswordResetController::class, 'sendResetLinkEmail'])->name('password.email');
+Route::get('/reset-password/{token}', [App\Http\Controllers\PasswordResetController::class, 'showResetForm'])->name('password.reset');
+Route::post('/reset-password', [App\Http\Controllers\PasswordResetController::class, 'resetPassword'])->name('password.update');
+
 // Admin routes
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/', [App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('dashboard');
@@ -62,6 +68,7 @@ Route::middleware(['auth', 'role:siswa'])->prefix('siswa')->name('siswa.')->grou
 Route::middleware(['auth', 'role:kepala_sekolah'])->prefix('kepala-sekolah')->name('kepala-sekolah.')->group(function () {
     Route::get('/', [App\Http\Controllers\KepalaSekolah\DashboardController::class, 'index'])->name('dashboard');
     Route::get('siswa-alpa', [App\Http\Controllers\KepalaSekolah\DashboardController::class, 'getSiswaAlpa'])->name('siswa.alpa');
+    Route::get('siswa-by-status/{status}', [App\Http\Controllers\KepalaSekolah\DashboardController::class, 'getSiswaByStatus'])->name('siswa.byStatus');
     Route::resource('laporan', App\Http\Controllers\KepalaSekolah\LaporanController::class)->only(['index']);
     Route::get('laporan/export-excel', [App\Http\Controllers\KepalaSekolah\LaporanController::class, 'exportExcel'])->name('laporan.exportExcel');
     Route::get('laporan/export-pdf', [App\Http\Controllers\KepalaSekolah\LaporanController::class, 'exportPdf'])->name('laporan.exportPdf');

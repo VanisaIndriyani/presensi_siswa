@@ -17,18 +17,37 @@ class SiswaController extends Controller
 
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'nama' => 'required',
-            'nisn' => 'required|unique:siswas,nisn',
-            'kelas' => 'required',
-            'qr_code' => 'nullable|unique:siswas,qr_code',
-            'jenis_kelamin' => 'nullable',
-        ]);
-        if (empty($validated['qr_code'])) {
-            $validated['qr_code'] = uniqid('QR');
+        try {
+            $validated = $request->validate([
+                'nama' => 'required|string|max:255',
+                'nisn' => 'required|string|unique:siswas,nisn|digits:10',
+                'kelas' => 'required|string|max:50',
+                'qr_code' => 'nullable|string|unique:siswas,qr_code',
+                'jenis_kelamin' => 'nullable|string|in:Laki-laki,Perempuan',
+            ], [
+                'nisn.digits' => 'NISN harus terdiri dari 10 digit angka.',
+                'nisn.unique' => 'NISN sudah terdaftar dalam sistem.',
+                'qr_code.unique' => 'QR Code sudah digunakan.',
+                'nama.required' => 'Nama siswa harus diisi.',
+                'kelas.required' => 'Kelas harus dipilih.',
+            ]);
+
+            if (empty($validated['qr_code'])) {
+                $validated['qr_code'] = 'QR' . uniqid() . time();
+            }
+
+            $siswa = Siswa::create($validated);
+            
+            return redirect()->route('admin.siswa.index')
+                ->with('success', 'Siswa berhasil ditambahkan! NISN: ' . $validated['nisn']);
+                
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return back()->withErrors($e->errors())->withInput();
+        } catch (\Exception $e) {
+            \Log::error('Error creating siswa: ' . $e->getMessage());
+            return back()->withErrors(['error' => 'Terjadi kesalahan saat menyimpan data. Silakan coba lagi.'])
+                ->withInput();
         }
-        Siswa::create($validated);
-        return redirect()->route('admin.siswa.index')->with('success', 'Siswa berhasil ditambahkan!');
     }
 
     public function show(Siswa $siswa)
@@ -43,15 +62,33 @@ class SiswaController extends Controller
 
     public function update(Request $request, Siswa $siswa)
     {
-        $validated = $request->validate([
-            'nama' => 'required',
-            'nisn' => 'required|unique:siswas,nisn,' . $siswa->id,
-            'kelas' => 'required',
-            'qr_code' => 'nullable|unique:siswas,qr_code,' . $siswa->id,
-            'jenis_kelamin' => 'nullable',
-        ]);
-        $siswa->update($validated);
-        return redirect()->route('admin.siswa.index')->with('success', 'Siswa berhasil diupdate!');
+        try {
+            $validated = $request->validate([
+                'nama' => 'required|string|max:255',
+                'nisn' => 'required|string|unique:siswas,nisn,' . $siswa->id . '|digits:10',
+                'kelas' => 'required|string|max:50',
+                'qr_code' => 'nullable|string|unique:siswas,qr_code,' . $siswa->id,
+                'jenis_kelamin' => 'nullable|string|in:Laki-laki,Perempuan',
+            ], [
+                'nisn.digits' => 'NISN harus terdiri dari 10 digit angka.',
+                'nisn.unique' => 'NISN sudah terdaftar dalam sistem.',
+                'qr_code.unique' => 'QR Code sudah digunakan.',
+                'nama.required' => 'Nama siswa harus diisi.',
+                'kelas.required' => 'Kelas harus dipilih.',
+            ]);
+
+            $siswa->update($validated);
+            
+            return redirect()->route('admin.siswa.index')
+                ->with('success', 'Data siswa berhasil diupdate!');
+                
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return back()->withErrors($e->errors())->withInput();
+        } catch (\Exception $e) {
+            \Log::error('Error updating siswa: ' . $e->getMessage());
+            return back()->withErrors(['error' => 'Terjadi kesalahan saat mengupdate data. Silakan coba lagi.'])
+                ->withInput();
+        }
     }
 
     public function destroy(Siswa $siswa)

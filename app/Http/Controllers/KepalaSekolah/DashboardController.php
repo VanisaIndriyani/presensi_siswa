@@ -175,4 +175,48 @@ class DashboardController extends Controller
         
         return response()->json($siswaAlpa);
     }
+
+    public function getSiswaByStatus($status)
+    {
+        $today = Carbon::today();
+        
+        if ($status === 'total') {
+            // Ambil semua siswa
+            $siswas = Siswa::orderBy('nama')->get()->map(function($siswa) {
+                return [
+                    'nama' => $siswa->nama,
+                    'nisn' => $siswa->nisn,
+                    'kelas' => $siswa->kelas,
+                    'jenis_kelamin' => $siswa->jenis_kelamin
+                ];
+            });
+        } elseif ($status === 'absen') {
+            // Ambil siswa yang tidak ada presensi hari ini
+            $siswaHadir = Presensi::whereDate('tanggal', $today)->pluck('siswa_id');
+            $siswas = Siswa::whereNotIn('id', $siswaHadir)->orderBy('nama')->get()->map(function($siswa) {
+                return [
+                    'nama' => $siswa->nama,
+                    'nisn' => $siswa->nisn,
+                    'kelas' => $siswa->kelas,
+                    'jenis_kelamin' => $siswa->jenis_kelamin
+                ];
+            });
+        } else {
+            // Ambil siswa berdasarkan status presensi
+            $siswas = Presensi::whereDate('tanggal', $today)
+                ->where('status', $status)
+                ->with('siswa')
+                ->get()
+                ->map(function($presensi) {
+                    return [
+                        'nama' => $presensi->siswa->nama ?? '-',
+                        'nisn' => $presensi->siswa->nisn ?? '-',
+                        'kelas' => $presensi->siswa->kelas ?? '-',
+                        'jenis_kelamin' => $presensi->siswa->jenis_kelamin ?? '-'
+                    ];
+                });
+        }
+        
+        return response()->json($siswas);
+    }
 }

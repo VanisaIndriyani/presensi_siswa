@@ -136,46 +136,46 @@
     @endif
 @endif
 <div class="dashboard-cards">
-    <div class="stat-card" style="background: linear-gradient(135deg, #38bdf8 0%, #6366f1 100%);">
+    <div class="stat-card" style="background: linear-gradient(135deg, #38bdf8 0%, #6366f1 100%);" onclick="showSiswaByStatus('total')" style="cursor: pointer;">
         <div class="stat-icon"><i class="fas fa-users"></i></div>
         <div class="stat-info">
             <div class="stat-label">Total Siswa</div>
             <div class="stat-value">{{ $totalSiswa ?? 0 }}</div>
         </div>
     </div>
-    <div class="stat-card" style="background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);">
+    <div class="stat-card" style="background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);" onclick="showSiswaByStatus('tepat_waktu')" style="cursor: pointer;">
         <div class="stat-icon"><i class="fas fa-user-check"></i></div>
         <div class="stat-info">
             <div class="stat-label">Hadir Hari Ini</div>
             <div class="stat-value">{{ $hadirHariIni ?? 0 }}</div>
         </div>
     </div>
-    <div class="stat-card" style="background: linear-gradient(135deg, #ef4444 0%, #f59e42 100%);">
+    <div class="stat-card" style="background: linear-gradient(135deg, #ef4444 0%, #f59e42 100%);" onclick="showSiswaByStatus('terlambat')" style="cursor: pointer;">
         <div class="stat-icon"><i class="fas fa-user-clock"></i></div>
         <div class="stat-info">
             <div class="stat-label">Terlambat Hari Ini</div>
             <div class="stat-value">{{ $terlambatHariIni ?? 0 }}</div>
         </div>
     </div>
-    <div class="stat-card" style="background: linear-gradient(135deg, #38bdf8 0%, #818cf8 100%);">
+    <div class="stat-card" style="background: linear-gradient(135deg, #38bdf8 0%, #818cf8 100%);" onclick="showSiswaByStatus('sakit')" style="cursor: pointer;">
         <div class="stat-icon"><i class="fas fa-user-injured"></i></div>
         <div class="stat-info">
             <div class="stat-label">Sakit Hari Ini</div>
             <div class="stat-value">{{ $sakitHariIni ?? 0 }}</div>
         </div>
     </div>
-    <div class="stat-card" style="background: linear-gradient(135deg, #f472b6 0%, #facc15 100%);">
+    <div class="stat-card" style="background: linear-gradient(135deg, #f472b6 0%, #facc15 100%);" onclick="showSiswaByStatus('izin')" style="cursor: pointer;">
         <div class="stat-icon"><i class="fas fa-user-shield"></i></div>
         <div class="stat-info">
             <div class="stat-label">Izin Hari Ini</div>
             <div class="stat-value">{{ $izinHariIni ?? 0 }}</div>
         </div>
     </div>
-    <div class="stat-card" style="background: linear-gradient(135deg, #6b7280 0%, #a1a1aa 100%);">
+    <div class="stat-card" style="background: linear-gradient(135deg, #6b7280 0%, #a1a1aa 100%);" onclick="showSiswaByStatus('alpa')" style="cursor: pointer;">
         <div class="stat-icon"><i class="fas fa-user-slash"></i></div>
         <div class="stat-info">
-                            <div class="stat-label">Alpa Hari Ini</div>
-                <div class="stat-value">{{ $alpaHariIni ?? 0 }}</div>
+            <div class="stat-label">Alpa Hari Ini</div>
+            <div class="stat-value">{{ $alpaHariIni ?? 0 }}</div>
         </div>
     </div>
 </div>
@@ -455,6 +455,52 @@ function showAlpaModal() {
             console.error('Error fetching siswa alpa:', error);
             loading.classList.add('d-none');
             alert('Gagal memuat data siswa yang alpa');
+        });
+}
+
+// Function untuk menampilkan detail siswa berdasarkan status
+function showSiswaByStatus(status) {
+    const modal = new bootstrap.Modal(document.getElementById('modalSiswaAlpa'));
+    const loading = document.getElementById('loadingAlpa');
+    const siswaList = document.getElementById('siswaAlpaList');
+    const emptyAlpa = document.getElementById('emptyAlpa');
+    const tableBody = document.getElementById('siswaAlpaTableBody');
+
+    // Reset modal state
+    loading.classList.remove('d-none');
+    siswaList.classList.add('d-none');
+    emptyAlpa.classList.add('d-none');
+    tableBody.innerHTML = '';
+
+    modal.show();
+
+    // Fetch data siswa berdasarkan status
+    fetch(`/kepala-sekolah/siswa-by-status/${status}`)
+        .then(response => response.json())
+        .then(data => {
+            loading.classList.add('d-none');
+            
+            if (data.length > 0) {
+                siswaList.classList.remove('d-none');
+                data.forEach((siswa, index) => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${index + 1}</td>
+                        <td>${siswa.nama}</td>
+                        <td>${siswa.nisn}</td>
+                        <td>${siswa.kelas}</td>
+                        <td>${siswa.jenis_kelamin}</td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            } else {
+                emptyAlpa.classList.remove('d-none');
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching siswa by status:', error);
+            loading.classList.add('d-none');
+            alert('Gagal memuat data siswa berdasarkan status');
         });
 }
 

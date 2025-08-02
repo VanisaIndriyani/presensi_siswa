@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Sistem Presensi Siswa</title>
+    <title>Reset Password - Sistem Presensi Siswa</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
@@ -23,7 +23,7 @@
             padding: 20px;
         }
 
-        .login-container {
+        .reset-container {
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
             border-radius: 20px;
@@ -35,7 +35,7 @@
             overflow: hidden;
         }
 
-        .login-container::before {
+        .reset-container::before {
             content: '';
             position: absolute;
             top: 0;
@@ -52,12 +52,12 @@
             50% { background-position: 100% 50%; }
         }
 
-        .login-header {
+        .reset-header {
             text-align: center;
             margin-bottom: 2.5rem;
         }
 
-        .logo-container {
+        .icon-container {
             width: 80px;
             height: 80px;
             background: linear-gradient(135deg, #667eea, #764ba2);
@@ -69,12 +69,12 @@
             box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
         }
 
-        .logo-container i {
+        .icon-container i {
             font-size: 2rem;
             color: white;
         }
 
-        .login-header h1 {
+        .reset-header h1 {
             color: #2d3748;
             font-size: 1.8rem;
             font-weight: 700;
@@ -82,7 +82,7 @@
             letter-spacing: -0.5px;
         }
 
-        .login-header p {
+        .reset-header p {
             color: #718096;
             font-size: 0.95rem;
             margin: 0;
@@ -113,6 +113,7 @@
             color: #a0aec0;
             font-size: 1.1rem;
             transition: color 0.3s ease;
+            cursor: pointer;
         }
 
         .form-control {
@@ -137,7 +138,7 @@
             color: #667eea;
         }
 
-        .btn-login {
+        .btn-reset {
             width: 100%;
             padding: 15px;
             background: linear-gradient(135deg, #667eea, #764ba2);
@@ -153,7 +154,7 @@
             overflow: hidden;
         }
 
-        .btn-login::before {
+        .btn-reset::before {
             content: '';
             position: absolute;
             top: 0;
@@ -164,36 +165,13 @@
             transition: left 0.5s;
         }
 
-        .btn-login:hover::before {
+        .btn-reset:hover::before {
             left: 100%;
         }
 
-        .btn-login:hover {
+        .btn-reset:hover {
             transform: translateY(-2px);
             box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
-        }
-
-        .btn-forgot-password {
-            width: 100%;
-            padding: 12px;
-            background: transparent;
-            color: #667eea;
-            border: 2px solid #667eea;
-            border-radius: 12px;
-            font-size: 0.95rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            display: inline-block;
-            text-align: center;
-        }
-
-        .btn-forgot-password:hover {
-            background: #667eea;
-            color: white;
-            transform: translateY(-1px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
         }
 
         .error-message {
@@ -206,114 +184,138 @@
             border-left: 4px solid #e53e3e;
         }
 
-        .error-message i {
-            margin-right: 8px;
-        }
-
-        .success-message {
-            background: #d4edda;
-            color: #155724;
-            padding: 12px;
-            border-radius: 8px;
+        .info-box {
+            background: linear-gradient(135deg, #fef5e7, #fbd38d);
+            border: none;
+            border-radius: 10px;
+            padding: 1rem;
             margin-bottom: 1.5rem;
-            font-size: 0.9rem;
-            border-left: 4px solid #28a745;
+            color: #744210;
         }
 
-        .success-message i {
-            margin-right: 8px;
+        .password-strength {
+            margin-top: 0.5rem;
+            font-size: 0.8rem;
+            color: #718096;
         }
+
+        .strength-weak { color: #e53e3e; }
+        .strength-medium { color: #d69e2e; }
+        .strength-strong { color: #38a169; }
 
         @media (max-width: 480px) {
-            .login-container {
+            .reset-container {
                 padding: 2rem;
                 margin: 10px;
             }
             
-            .login-header h1 {
+            .reset-header h1 {
                 font-size: 1.5rem;
             }
         }
     </style>
 </head>
 <body>
-    <div class="login-container">
-        <div class="login-header">
-            <div class="logo-container">
-                <i class="fas fa-graduation-cap"></i>
+    <div class="reset-container">
+        <div class="reset-header">
+            <div class="icon-container">
+                <i class="fas fa-lock"></i>
             </div>
-            <h1>Sistem Presensi Siswa</h1>
-            <p>Silakan login untuk melanjutkan</p>
+            <h1>Reset Password</h1>
+            <p>Masukkan password baru Anda</p>
         </div>
 
-        @if ($errors->any())
+        @if($errors->any())
             <div class="error-message">
                 <i class="fas fa-exclamation-triangle me-2"></i>
-                @foreach ($errors->all() as $error)
+                @foreach($errors->all() as $error)
                     {{ $error }}<br>
                 @endforeach
             </div>
         @endif
 
-        @if(session('success'))
-            <div class="success-message">
-                <i class="fas fa-check-circle me-2"></i>
-                {{ session('success') }}
-            </div>
-        @endif
+        <div class="info-box">
+            <i class="fas fa-info-circle me-2"></i>
+            <strong>Password harus minimal 8 karakter</strong>
+        </div>
 
-        <form method="POST" action="{{ route('login') }}">
+        <form method="POST" action="{{ route('password.update') }}">
             @csrf
-            <div class="form-group">
-                <label for="email">Email</label>
-                <div class="input-group">
-                    <input type="email" id="email" name="email" value="{{ old('email') }}" 
-                           class="form-control" required autofocus placeholder="Masukkan email Anda">
-                    <i class="fas fa-envelope"></i>
-                </div>
-            </div>
+            <input type="hidden" name="token" value="{{ $token }}">
+            <input type="hidden" name="email" value="{{ $email }}">
 
             <div class="form-group">
-                <label for="password">Password</label>
+                <label for="password">Password Baru</label>
                 <div class="input-group">
                     <input type="password" id="password" name="password" 
-                           class="form-control" required placeholder="Masukkan password Anda">
-                    <i class="fas fa-lock"></i>
+                           class="form-control" required placeholder="Masukkan password baru">
+                    <i class="fas fa-lock" onclick="togglePassword('password')"></i>
+                </div>
+                <div class="password-strength" id="password-strength"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="password_confirmation">Konfirmasi Password</label>
+                <div class="input-group">
+                    <input type="password" id="password_confirmation" name="password_confirmation" 
+                           class="form-control" required placeholder="Konfirmasi password baru">
+                    <i class="fas fa-lock" onclick="togglePassword('password_confirmation')"></i>
                 </div>
             </div>
 
-            <button type="submit" class="btn-login">
-                <i class="fas fa-sign-in-alt me-2"></i>Login
+            <button type="submit" class="btn-reset">
+                <i class="fas fa-save me-2"></i>Simpan Password Baru
             </button>
         </form>
-
-        <button type="button" class="btn-forgot-password" onclick="window.location.href='{{ route('password.request') }}'">
-            <i class="fas fa-key me-2"></i>Lupa Password?
-        </button>
     </div>
 
     <script>
-        // Auto focus on email input
-        document.addEventListener('DOMContentLoaded', function() {
-            document.getElementById('email').focus();
+        function togglePassword(inputId) {
+            const input = document.getElementById(inputId);
+            const icon = input.nextElementSibling;
+            
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.remove('fa-lock');
+                icon.classList.add('fa-lock-open');
+            } else {
+                input.type = 'password';
+                icon.classList.remove('fa-lock-open');
+                icon.classList.add('fa-lock');
+            }
+        }
+
+        // Password strength checker
+        document.getElementById('password').addEventListener('input', function() {
+            const password = this.value;
+            const strengthDiv = document.getElementById('password-strength');
+            
+            let strength = 0;
+            let message = '';
+            
+            if (password.length >= 8) strength++;
+            if (password.match(/[a-z]/)) strength++;
+            if (password.match(/[A-Z]/)) strength++;
+            if (password.match(/[0-9]/)) strength++;
+            if (password.match(/[^a-zA-Z0-9]/)) strength++;
+            
+            if (strength < 3) {
+                message = 'Password lemah';
+                strengthDiv.className = 'password-strength strength-weak';
+            } else if (strength < 4) {
+                message = 'Password sedang';
+                strengthDiv.className = 'password-strength strength-medium';
+            } else {
+                message = 'Password kuat';
+                strengthDiv.className = 'password-strength strength-strong';
+            }
+            
+            strengthDiv.textContent = message;
         });
 
-        // Show/hide password functionality (optional)
+        // Auto focus on password input
         document.addEventListener('DOMContentLoaded', function() {
-            const passwordInput = document.getElementById('password');
-            const lockIcon = passwordInput.nextElementSibling;
-            
-            lockIcon.addEventListener('click', function() {
-                if (passwordInput.type === 'password') {
-                    passwordInput.type = 'text';
-                    lockIcon.classList.remove('fa-lock');
-                    lockIcon.classList.add('fa-lock-open');
-                } else {
-                    passwordInput.type = 'password';
-                    lockIcon.classList.remove('fa-lock-open');
-                    lockIcon.classList.add('fa-lock');
-                }
-            });
+            document.getElementById('password').focus();
         });
     </script>
 </body>

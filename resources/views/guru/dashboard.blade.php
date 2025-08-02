@@ -277,6 +277,9 @@
                         <select name="status" class="form-select" required>
                             <option value="tepat_waktu">Tepat Waktu</option>
                             <option value="terlambat">Terlambat</option>
+                            <option value="izin">Izin</option>
+                            <option value="sakit">Sakit</option>
+                            <option value="alpa">Alpa</option>
                         </select>
                     </div>
                     <div class="mb-3">
