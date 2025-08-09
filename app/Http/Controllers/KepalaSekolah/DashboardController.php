@@ -159,52 +159,10 @@ class DashboardController extends Controller
     {
         $today = Carbon::today();
         
-        // Ambil siswa yang alpa hari ini
-        $siswaAlpa = Presensi::whereDate('tanggal', $today)
-            ->where('status', 'alpa')
-            ->with('siswa')
-            ->get()
-            ->map(function($presensi) {
-                return [
-                    'nama' => $presensi->siswa->nama ?? '-',
-                    'nisn' => $presensi->siswa->nisn ?? '-',
-                    'kelas' => $presensi->siswa->kelas ?? '-',
-                    'jenis_kelamin' => $presensi->siswa->jenis_kelamin ?? '-'
-                ];
-            });
-        
-        return response()->json($siswaAlpa);
-    }
-
-    public function getSiswaByStatus($status)
-    {
-        $today = Carbon::today();
-        
-        if ($status === 'total') {
-            // Ambil semua siswa
-            $siswas = Siswa::orderBy('nama')->get()->map(function($siswa) {
-                return [
-                    'nama' => $siswa->nama,
-                    'nisn' => $siswa->nisn,
-                    'kelas' => $siswa->kelas,
-                    'jenis_kelamin' => $siswa->jenis_kelamin
-                ];
-            });
-        } elseif ($status === 'absen') {
-            // Ambil siswa yang tidak ada presensi hari ini
-            $siswaHadir = Presensi::whereDate('tanggal', $today)->pluck('siswa_id');
-            $siswas = Siswa::whereNotIn('id', $siswaHadir)->orderBy('nama')->get()->map(function($siswa) {
-                return [
-                    'nama' => $siswa->nama,
-                    'nisn' => $siswa->nisn,
-                    'kelas' => $siswa->kelas,
-                    'jenis_kelamin' => $siswa->jenis_kelamin
-                ];
-            });
-        } else {
-            // Ambil siswa berdasarkan status presensi
-            $siswas = Presensi::whereDate('tanggal', $today)
-                ->where('status', $status)
+        try {
+            // Ambil siswa yang alpa hari ini
+            $siswaAlpa = Presensi::whereDate('tanggal', $today)
+                ->where('status', 'alpa')
                 ->with('siswa')
                 ->get()
                 ->map(function($presensi) {
@@ -215,8 +173,60 @@ class DashboardController extends Controller
                         'jenis_kelamin' => $presensi->siswa->jenis_kelamin ?? '-'
                     ];
                 });
+            
+            return response()->json($siswaAlpa);
+        } catch (\Exception $e) {
+            \Log::error('Error in getSiswaAlpa: ' . $e->getMessage());
+            return response()->json(['error' => 'Terjadi kesalahan saat mengambil data'], 500);
         }
+    }
+
+    public function getSiswaByStatus($status)
+    {
+        $today = Carbon::today();
         
-        return response()->json($siswas);
+        try {
+            if ($status === 'total') {
+                // Ambil semua siswa
+                $siswas = Siswa::orderBy('nama')->get()->map(function($siswa) {
+                    return [
+                        'nama' => $siswa->nama,
+                        'nisn' => $siswa->nisn,
+                        'kelas' => $siswa->kelas,
+                        'jenis_kelamin' => $siswa->jenis_kelamin
+                    ];
+                });
+            } elseif ($status === 'absen') {
+                // Ambil siswa yang tidak ada presensi hari ini
+                $siswaHadir = Presensi::whereDate('tanggal', $today)->pluck('siswa_id');
+                $siswas = Siswa::whereNotIn('id', $siswaHadir)->orderBy('nama')->get()->map(function($siswa) {
+                    return [
+                        'nama' => $siswa->nama,
+                        'nisn' => $siswa->nisn,
+                        'kelas' => $siswa->kelas,
+                        'jenis_kelamin' => $siswa->jenis_kelamin
+                    ];
+                });
+            } else {
+                // Ambil siswa berdasarkan status presensi
+                $siswas = Presensi::whereDate('tanggal', $today)
+                    ->where('status', $status)
+                    ->with('siswa')
+                    ->get()
+                    ->map(function($presensi) {
+                        return [
+                            'nama' => $presensi->siswa->nama ?? '-',
+                            'nisn' => $presensi->siswa->nisn ?? '-',
+                            'kelas' => $presensi->siswa->kelas ?? '-',
+                            'jenis_kelamin' => $presensi->siswa->jenis_kelamin ?? '-'
+                        ];
+                    });
+            }
+            
+            return response()->json($siswas);
+        } catch (\Exception $e) {
+            \Log::error('Error in getSiswaByStatus: ' . $e->getMessage());
+            return response()->json(['error' => 'Terjadi kesalahan saat mengambil data'], 500);
+        }
     }
 }

@@ -35,12 +35,26 @@
         color: #7C3AED !important; /* Ungu untuk judul */
         font-weight: 700;
     }
-    .table th {
-        color: #3B82F6 !important; /* Biru untuk header tabel */
+    
+    /* Header tabel tanpa warna background */
+    .table thead th {
+        background: #f8f9fa !important; /* Light gray background */
+        color: #495057 !important; /* Dark gray text */
         font-weight: 600;
+        border: 1px solid #dee2e6;
+        padding: 12px 8px;
+        text-align: center;
+        vertical-align: middle;
     }
+    
+
+    
+
+    
     .table td {
         color: #4B5563 !important; /* Abu-abu medium untuk isi tabel */
+        vertical-align: middle;
+        padding: 10px 8px;
     }
     .form-label {
         color: #7C3AED !important; /* Ungu untuk label */
@@ -48,6 +62,34 @@
     }
     .form-control::placeholder {
         color: #9CA3AF !important; /* Abu-abu untuk placeholder */
+    }
+    
+    /* Highlight search results */
+    mark {
+        background-color: #fef08a !important;
+        color: #92400e !important;
+        padding: 2px 4px;
+        border-radius: 3px;
+        font-weight: bold;
+    }
+    
+    /* Search input group styling */
+    .input-group-text {
+        background-color: #f8fafc;
+        border-color: #d1d5db;
+    }
+    
+    /* Responsive form */
+    @media (max-width: 768px) {
+        .d-flex.flex-wrap {
+            flex-direction: column !important;
+        }
+        .d-flex.flex-wrap > div {
+            margin-bottom: 1rem !important;
+        }
+        .input-group {
+            width: 100% !important;
+        }
     }
 </style>
 <div class="d-flex justify-content-between align-items-center mb-4">
@@ -58,8 +100,21 @@
     <div class="alert alert-success">{{ session('success') }}</div>
 @endif
 
-<form id="filterForm" method="GET" class="d-flex align-items-center mb-3" action="">
-    <div class="me-2">
+<form id="filterForm" method="GET" class="d-flex align-items-center mb-3 flex-wrap" action="">
+    <div class="me-2 mb-2">
+        <label for="searchSiswa" class="form-label mb-0">Cari Siswa:</label>
+        <div class="input-group" style="width:280px;">
+            <span class="input-group-text"><i class="fas fa-search"></i></span>
+            <input type="text" name="search" id="searchSiswa" class="form-control" placeholder="Nama atau NISN siswa..." value="{{ request('search') }}">
+            @if(request('search'))
+                <button type="button" class="btn btn-outline-secondary" onclick="clearSearch()">
+                    <i class="fas fa-times"></i>
+                </button>
+            @endif
+        </div>
+        <small class="form-text text-muted">Tekan Ctrl+F untuk fokus pencarian</small>
+    </div>
+    <div class="me-2 mb-2">
         <label for="filterKelas" class="form-label mb-0">Filter Kelas:</label>
         <select name="kelas" id="filterKelas" class="form-select" style="width:auto; display:inline-block;">
             <option value="">Semua Kelas</option>
@@ -68,7 +123,7 @@
             @endforeach
         </select>
     </div>
-    <div class="me-2">
+    <div class="me-2 mb-2">
         <label for="filterBulan" class="form-label mb-0">Filter Bulan:</label>
         <select name="bulan" id="filterBulan" class="form-select" style="width:auto; display:inline-block;">
             <option value="">Semua Bulan</option>
@@ -77,7 +132,7 @@
             @endfor
         </select>
     </div>
-    <div class="me-2">
+    <div class="me-2 mb-2">
         <label for="filterTahun" class="form-label mb-0">Tahun:</label>
         <select name="tahun" id="filterTahun" class="form-select" style="width:auto; display:inline-block;">
             @for($y = now()->year; $y >= now()->year - 5; $y--)
@@ -85,14 +140,38 @@
             @endfor
         </select>
     </div>
-    <button type="submit" class="btn btn-primary ms-2">Filter</button>
+    <div class="d-flex gap-2 mb-2">
+        <button type="submit" class="btn btn-primary">
+            <i class="fas fa-search me-1"></i>Filter
+        </button>
+        <a href="{{ route('admin.presensi.index') }}" class="btn btn-secondary">
+            <i class="fas fa-refresh me-1"></i>Reset
+        </a>
+    </div>
 </form>
+
+@if(request('search') || request('kelas') || request('bulan') || request('tahun'))
+    <div class="alert alert-info mb-3">
+        <i class="fas fa-filter me-2"></i>
+        <strong>Filter Aktif:</strong>
+        @if(request('search'))
+            <span class="badge bg-primary me-1">Pencarian: "{{ request('search') }}"</span>
+        @endif
+        @if(request('kelas'))
+            <span class="badge bg-success me-1">Kelas: {{ request('kelas') }}</span>
+        @endif
+        @if(request('bulan') && request('tahun'))
+            <span class="badge bg-warning me-1">Periode: {{ DateTime::createFromFormat('!m', request('bulan'))->format('F') }} {{ request('tahun') }}</span>
+        @endif
+        <span class="badge bg-secondary">Total: {{ $presensis->count() }} data</span>
+    </div>
+@endif
 
 <div class="card shadow-sm">
     <div class="card-body p-0">
         <div class="table-responsive">
             <table class="table table-striped mb-0">
-                <thead class="table-light">
+                <thead>
                     <tr>
                         <th>No</th>
                         <th>Nama Siswa</th>
@@ -107,10 +186,22 @@
                 </thead>
                 <tbody>
                     @forelse($presensis as $i => $p)
-                        <tr>
+                        <tr @if(request('search') && (stripos($p->siswa->nama ?? '', request('search')) !== false || stripos($p->siswa->nisn ?? '', request('search')) !== false)) class="table-warning" @endif>
                             <td>{{ $i+1 }}</td>
-                            <td>{{ $p->siswa->nama ?? '-' }}</td>
-                            <td>{{ $p->siswa->nisn ?? '-' }}</td>
+                            <td>
+                                @if(request('search') && stripos($p->siswa->nama ?? '', request('search')) !== false)
+                                    {!! str_ireplace(request('search'), '<mark>' . request('search') . '</mark>', $p->siswa->nama ?? '-') !!}
+                                @else
+                                    {{ $p->siswa->nama ?? '-' }}
+                                @endif
+                            </td>
+                            <td>
+                                @if(request('search') && stripos($p->siswa->nisn ?? '', request('search')) !== false)
+                                    {!! str_ireplace(request('search'), '<mark>' . request('search') . '</mark>', $p->siswa->nisn ?? '-') !!}
+                                @else
+                                    {{ $p->siswa->nisn ?? '-' }}
+                                @endif
+                            </td>
                             <td>{{ $p->siswa->kelas ?? '-' }}</td>
                             <td>{{ $p->waktu_scan }}</td>
                             <td>{{ $p->jam_pulang ? $p->jam_pulang : '-' }}</td>
@@ -385,6 +476,47 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('filterForm').addEventListener('submit', function(e) {
         // Form will submit normally
     });
+    
+    // Real-time search functionality
+    let searchTimeout;
+    const searchInput = document.getElementById('searchSiswa');
+    
+    searchInput.addEventListener('input', function() {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+            // Auto-submit form after 500ms delay
+            document.getElementById('filterForm').submit();
+        }, 500);
+    });
+    
+    // Clear search when reset button is clicked
+    document.querySelector('a[href*="presensi"]').addEventListener('click', function(e) {
+        if (this.textContent.includes('Reset')) {
+            // Clear search input before redirecting
+            searchInput.value = '';
+        }
+    });
+    
+    // Keyboard shortcuts
+    document.addEventListener('keydown', function(e) {
+        // Ctrl/Cmd + F to focus search
+        if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
+            e.preventDefault();
+            searchInput.focus();
+        }
+        
+        // Escape to clear search
+        if (e.key === 'Escape' && document.activeElement === searchInput) {
+            searchInput.value = '';
+            document.getElementById('filterForm').submit();
+        }
+    });
+    
+    // Function to clear search
+    window.clearSearch = function() {
+        document.getElementById('searchSiswa').value = '';
+        document.getElementById('filterForm').submit();
+    };
 });
 </script>
 @endsection 

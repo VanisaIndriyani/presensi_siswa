@@ -57,11 +57,19 @@ class LiburController extends Controller
         $request->validate([
             'start_time' => 'required|date_format:H:i',
             'end_time' => 'required|date_format:H:i',
+            'jam_pulang_minimal' => 'required|date_format:H:i',
+            'selisih_jam_minimal' => 'required|integer|min:1|max:12',
         ], [
             'start_time.required' => 'Jam mulai masuk harus diisi',
             'start_time.date_format' => 'Format jam mulai tidak valid',
             'end_time.required' => 'Jam tutup masuk harus diisi',
             'end_time.date_format' => 'Format jam tutup tidak valid',
+            'jam_pulang_minimal.required' => 'Jam pulang minimal harus diisi',
+            'jam_pulang_minimal.date_format' => 'Format jam pulang minimal tidak valid',
+            'selisih_jam_minimal.required' => 'Selisih jam minimal harus diisi',
+            'selisih_jam_minimal.integer' => 'Selisih jam minimal harus berupa angka',
+            'selisih_jam_minimal.min' => 'Selisih jam minimal minimal 1 jam',
+            'selisih_jam_minimal.max' => 'Selisih jam minimal maksimal 12 jam',
         ]);
 
         // Validasi manual untuk memastikan end_time setelah start_time
@@ -69,13 +77,18 @@ class LiburController extends Controller
             return back()->withErrors(['end_time' => 'Jam tutup harus setelah jam mulai'])->withInput();
         }
 
+        // Validasi jam pulang minimal harus setelah jam tutup masuk
+        if ($request->end_time >= $request->jam_pulang_minimal) {
+            return back()->withErrors(['jam_pulang_minimal' => 'Jam pulang minimal harus setelah jam tutup masuk'])->withInput();
+        }
+
         $jamMasuk = JamMasuk::first();
         if (!$jamMasuk) {
-            JamMasuk::create($request->only('start_time', 'end_time'));
+            JamMasuk::create($request->only('start_time', 'end_time', 'jam_pulang_minimal', 'selisih_jam_minimal'));
         } else {
-            $jamMasuk->update($request->only('start_time', 'end_time'));
+            $jamMasuk->update($request->only('start_time', 'end_time', 'jam_pulang_minimal', 'selisih_jam_minimal'));
         }
         
-        return redirect()->route('admin.libur.index')->with('success', 'Jam masuk berhasil diupdate!');
+        return redirect()->route('admin.libur.index')->with('success', 'Pengaturan jam presensi berhasil diupdate!');
     }
 }

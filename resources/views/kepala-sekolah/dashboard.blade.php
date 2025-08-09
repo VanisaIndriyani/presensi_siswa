@@ -430,9 +430,19 @@ function showAlpaModal() {
     
     // Fetch data siswa yang alpa
     fetch('/kepala-sekolah/siswa-alpa')
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
         .then(data => {
             loading.classList.add('d-none');
+            
+            // Check if data has error property
+            if (data.error) {
+                throw new Error(data.error);
+            }
             
             if (data.length > 0) {
                 siswaList.classList.remove('d-none');
@@ -440,10 +450,10 @@ function showAlpaModal() {
                     const row = document.createElement('tr');
                     row.innerHTML = `
                         <td>${index + 1}</td>
-                        <td>${siswa.nama}</td>
-                        <td>${siswa.nisn}</td>
-                        <td>${siswa.kelas}</td>
-                        <td>${siswa.jenis_kelamin}</td>
+                        <td>${siswa.nama || '-'}</td>
+                        <td>${siswa.nisn || '-'}</td>
+                        <td>${siswa.kelas || '-'}</td>
+                        <td>${siswa.jenis_kelamin || '-'}</td>
                     `;
                     tableBody.appendChild(row);
                 });
@@ -454,7 +464,7 @@ function showAlpaModal() {
         .catch(error => {
             console.error('Error fetching siswa alpa:', error);
             loading.classList.add('d-none');
-            alert('Gagal memuat data siswa yang alpa');
+            alert('Gagal memuat data siswa yang alpa: ' + error.message);
         });
 }
 
@@ -476,9 +486,19 @@ function showSiswaByStatus(status) {
 
     // Fetch data siswa berdasarkan status
     fetch(`/kepala-sekolah/siswa-by-status/${status}`)
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
         .then(data => {
             loading.classList.add('d-none');
+            
+            // Check if data has error property
+            if (data.error) {
+                throw new Error(data.error);
+            }
             
             if (data.length > 0) {
                 siswaList.classList.remove('d-none');
@@ -486,10 +506,10 @@ function showSiswaByStatus(status) {
                     const row = document.createElement('tr');
                     row.innerHTML = `
                         <td>${index + 1}</td>
-                        <td>${siswa.nama}</td>
-                        <td>${siswa.nisn}</td>
-                        <td>${siswa.kelas}</td>
-                        <td>${siswa.jenis_kelamin}</td>
+                        <td>${siswa.nama || '-'}</td>
+                        <td>${siswa.nisn || '-'}</td>
+                        <td>${siswa.kelas || '-'}</td>
+                        <td>${siswa.jenis_kelamin || '-'}</td>
                     `;
                     tableBody.appendChild(row);
                 });
@@ -500,7 +520,7 @@ function showSiswaByStatus(status) {
         .catch(error => {
             console.error('Error fetching siswa by status:', error);
             loading.classList.add('d-none');
-            alert('Gagal memuat data siswa berdasarkan status');
+            alert('Gagal memuat data siswa berdasarkan status: ' + error.message);
         });
 }
 

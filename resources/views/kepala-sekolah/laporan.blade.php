@@ -130,10 +130,10 @@
     }
     
     .table thead th {
-        background: linear-gradient(135deg, #9966CC 0%, #663399 100%);
-        color: white;
+        background: #f8f9fa !important; /* Light gray background */
+        color: #495057 !important; /* Dark gray text */
         font-weight: 600;
-        border: none;
+        border: 1px solid #dee2e6;
         padding: 1rem 0.75rem;
         font-size: 0.9rem;
     }

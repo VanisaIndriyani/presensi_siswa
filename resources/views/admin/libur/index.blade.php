@@ -7,9 +7,14 @@
         color: #7C3AED !important; /* Ungu untuk judul */
         font-weight: 700;
     }
-    .table th {
-        color: #3B82F6 !important; /* Biru untuk header tabel */
+    .table thead th {
+        background: #f8f9fa !important; /* Light gray background */
+        color: #495057 !important; /* Dark gray text */
         font-weight: 600;
+        border: 1px solid #dee2e6;
+        padding: 12px 8px;
+        text-align: center;
+        vertical-align: middle;
     }
     .table td {
         color: #4B5563 !important; /* Abu-abu medium untuk isi tabel */
@@ -63,14 +68,17 @@
         @if($jamMasuk)
             <div class="alert alert-info mb-3">
                 <i class="fas fa-info-circle me-2"></i>
-                <strong>Jam Masuk Saat Ini:</strong> {{ $jamMasuk->start_time }} - {{ $jamMasuk->end_time }}
-                <br><small class="text-muted">Siswa dapat presensi tepat waktu jika masuk antara jam {{ $jamMasuk->start_time }} - {{ $jamMasuk->end_time }}</small>
+                <strong>Pengaturan Saat Ini:</strong><br>
+                • <strong>Jam Masuk:</strong> {{ $jamMasuk->start_time }} - {{ $jamMasuk->end_time }}<br>
+                • <strong>Jam Pulang Minimal:</strong> {{ $jamMasuk->jam_pulang_minimal ?? '12:00' }}<br>
+                • <strong>Selisih Jam Minimal:</strong> {{ $jamMasuk->selisih_jam_minimal ?? 4 }} jam<br>
+                <small class="text-muted">Siswa dapat presensi tepat waktu jika masuk antara jam {{ $jamMasuk->start_time }} - {{ $jamMasuk->end_time }}. Presensi pulang hanya bisa dilakukan setelah jam {{ $jamMasuk->jam_pulang_minimal ?? '12:00' }} dan minimal {{ $jamMasuk->selisih_jam_minimal ?? 4 }} jam setelah presensi masuk.</small>
             </div>
         @endif
         <form method="POST" action="{{ route('admin.libur.updateJamMasuk') }}">
             @csrf
             <div class="row">
-                <div class="col-md-4">
+                <div class="col-md-3">
                     <div class="mb-3">
                         <label class="form-label">Jam Mulai Masuk</label>
                         <input type="time" name="start_time" class="form-control @error('start_time') is-invalid @enderror" value="{{ old('start_time', $jamMasuk->start_time ?? '07:00') }}" required>
@@ -80,7 +88,7 @@
                         @enderror
                     </div>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-3">
                     <div class="mb-3">
                         <label class="form-label">Jam Tutup Masuk</label>
                         <input type="time" name="end_time" class="form-control @error('end_time') is-invalid @enderror" value="{{ old('end_time', $jamMasuk->end_time ?? '08:30') }}" required>
@@ -90,9 +98,31 @@
                         @enderror
                     </div>
                 </div>
-                <div class="col-md-4 d-flex align-items-end">
+                <div class="col-md-3">
+                    <div class="mb-3">
+                        <label class="form-label">Jam Pulang Minimal</label>
+                        <input type="time" name="jam_pulang_minimal" class="form-control @error('jam_pulang_minimal') is-invalid @enderror" value="{{ old('jam_pulang_minimal', $jamMasuk->jam_pulang_minimal ?? '12:00') }}" required>
+                        <small class="text-muted">Jam minimal untuk presensi pulang</small>
+                        @error('jam_pulang_minimal')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="mb-3">
+                        <label class="form-label">Selisih Jam Minimal</label>
+                        <input type="number" name="selisih_jam_minimal" class="form-control @error('selisih_jam_minimal') is-invalid @enderror" value="{{ old('selisih_jam_minimal', $jamMasuk->selisih_jam_minimal ?? 4) }}" min="1" max="12" required>
+                        <small class="text-muted">Minimal jam antara masuk dan pulang</small>
+                        @error('selisih_jam_minimal')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12">
                     <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-save me-1"></i>Update Jam Masuk
+                        <i class="fas fa-save me-1"></i>Update Pengaturan Jam Presensi
                     </button>
                 </div>
             </div>
@@ -278,10 +308,17 @@ hapusBtns.forEach(btn => {
 document.querySelector('form[action*="jam-masuk"]').addEventListener('submit', function(e) {
     const startTime = document.querySelector('input[name="start_time"]').value;
     const endTime = document.querySelector('input[name="end_time"]').value;
+    const jamPulangMinimal = document.querySelector('input[name="jam_pulang_minimal"]').value;
     
     if (startTime && endTime && startTime >= endTime) {
         e.preventDefault();
         alert('Jam tutup harus setelah jam mulai!');
+        return false;
+    }
+    
+    if (endTime && jamPulangMinimal && endTime >= jamPulangMinimal) {
+        e.preventDefault();
+        alert('Jam pulang minimal harus setelah jam tutup masuk!');
         return false;
     }
 });

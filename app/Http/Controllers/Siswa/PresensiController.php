@@ -41,10 +41,24 @@ class PresensiController extends Controller
             if ($presensi->jam_pulang) {
                 return redirect()->back()->with('error', 'Anda sudah melakukan presensi pulang hari ini!');
             }
-            // Hanya boleh presensi pulang setelah jam 14:00
-            if ($now->format('H:i') < '14:00') {
-                return redirect()->back()->with('error', 'Presensi pulang hanya bisa dilakukan setelah jam 14:00!');
+            
+            // Ambil pengaturan jam pulang dari database
+            $jamPulangMinimal = $jamMasuk ? $jamMasuk->jam_pulang_minimal : '12:00';
+            $selisihJamMinimal = $jamMasuk ? $jamMasuk->selisih_jam_minimal : 4;
+            
+            // Cek apakah sudah waktunya untuk presensi pulang
+            if ($now->format('H:i') < $jamPulangMinimal) {
+                return redirect()->back()->with('error', 'Presensi pulang hanya bisa dilakukan setelah jam ' . $jamPulangMinimal . '!');
             }
+            
+            // Cek apakah sudah cukup lama sejak presensi masuk
+            $waktuMasuk = $presensi->waktu_scan;
+            $selisihJam = $now->diffInHours($waktuMasuk);
+            
+            if ($selisihJam < $selisihJamMinimal) {
+                return redirect()->back()->with('error', 'Presensi pulang hanya bisa dilakukan minimal ' . $selisihJamMinimal . ' jam setelah presensi masuk!');
+            }
+            
             $presensi->update([
                 'jam_pulang' => $now,
             ]);

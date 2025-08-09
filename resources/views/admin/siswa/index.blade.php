@@ -44,9 +44,14 @@
         color: #7C3AED !important; /* Ungu untuk judul */
         font-weight: 700;
     }
-    .table th {
-        color: #3B82F6 !important; /* Biru untuk header tabel */
+    .table thead th {
+        background: #f8f9fa !important; /* Light gray background */
+        color: #495057 !important; /* Dark gray text */
         font-weight: 600;
+        border: 1px solid #dee2e6;
+        padding: 12px 8px;
+        text-align: center;
+        vertical-align: middle;
     }
     .table td {
         color: #4B5563 !important; /* Abu-abu medium untuk isi tabel */

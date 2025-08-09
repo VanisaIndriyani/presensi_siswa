@@ -16,7 +16,7 @@
         
         /* Sidebar Styles */
         .sidebar {
-            background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+            background: linear-gradient(135deg, #7c3aed 0%, #8b5cf6 100%);
             color: white;
             min-height: 100vh;
             position: fixed;
@@ -82,7 +82,7 @@
         /* Mobile Header */
         .mobile-header {
             display: none;
-            background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+            background: linear-gradient(135deg, #7c3aed 0%, #8b5cf6 100%);
             color: white;
             padding: 1rem;
             position: sticky;
@@ -143,6 +143,55 @@
             }
         }
         
+        /* Landscape Mobile Optimization */
+        @media (max-width: 768px) and (orientation: landscape) {
+            .sidebar {
+                width: 250px;
+                transform: translateX(-100%);
+            }
+            
+            .sidebar.show {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+                width: 100%;
+                padding: 0.5rem !important;
+            }
+            
+            .mobile-header {
+                padding: 0.5rem;
+                position: relative;
+            }
+            
+            .mobile-header h6 {
+                font-size: 0.8rem;
+            }
+            
+            .mobile-header small {
+                font-size: 0.7rem;
+            }
+            
+            .card {
+                margin-bottom: 0.5rem;
+            }
+            
+            .table-responsive {
+                font-size: 0.8rem;
+            }
+            
+            .btn {
+                padding: 0.25rem 0.5rem;
+                font-size: 0.8rem;
+            }
+            
+            .alert {
+                padding: 0.5rem;
+                margin-bottom: 0.5rem;
+            }
+        }
+        
         @media (max-width: 576px) {
             .sidebar {
                 width: 100%;
@@ -162,6 +211,42 @@
             
             .mobile-header small {
                 font-size: 0.75rem;
+            }
+        }
+        
+        /* Small landscape phones */
+        @media (max-width: 576px) and (orientation: landscape) {
+            .sidebar {
+                width: 200px;
+            }
+            
+            .main-content {
+                padding: 0.25rem !important;
+            }
+            
+            .mobile-header {
+                padding: 0.25rem 0.5rem;
+            }
+            
+            .mobile-header h6 {
+                font-size: 0.7rem;
+            }
+            
+            .mobile-header small {
+                font-size: 0.6rem;
+            }
+            
+            .card {
+                margin-bottom: 0.25rem;
+            }
+            
+            .table-responsive {
+                font-size: 0.7rem;
+            }
+            
+            .btn {
+                padding: 0.2rem 0.4rem;
+                font-size: 0.7rem;
             }
         }
         
@@ -384,11 +469,20 @@
             });
         });
         
-        // Handle window resize
+        // Handle window resize and orientation change
         window.addEventListener('resize', function() {
             if (window.innerWidth > 768) {
                 closeSidebar();
             }
+        });
+        
+        // Handle orientation change specifically
+        window.addEventListener('orientationchange', function() {
+            setTimeout(function() {
+                if (window.innerWidth > 768) {
+                    closeSidebar();
+                }
+            }, 100);
         });
         
         // Close sidebar on escape key

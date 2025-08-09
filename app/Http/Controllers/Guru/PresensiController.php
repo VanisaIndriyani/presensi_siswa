@@ -176,11 +176,26 @@ class PresensiController extends Controller
                 ]);
             }
             
-            // Hanya boleh presensi pulang setelah jam 07:30
-            if ($now->format('H:i') < '07:30') {
+            // Ambil pengaturan jam pulang dari database
+            $jamPulangMinimal = $jamMasuk ? $jamMasuk->jam_pulang_minimal : '12:00';
+            $selisihJamMinimal = $jamMasuk ? $jamMasuk->selisih_jam_minimal : 4;
+            
+            // Cek apakah sudah waktunya untuk presensi pulang
+            if ($now->format('H:i') < $jamPulangMinimal) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Presensi pulang hanya bisa dilakukan setelah jam 07:30!'
+                    'message' => 'Presensi pulang hanya bisa dilakukan setelah jam ' . $jamPulangMinimal . '!'
+                ]);
+            }
+            
+            // Cek apakah sudah cukup lama sejak presensi masuk
+            $waktuMasuk = $presensi->waktu_scan;
+            $selisihJam = $now->diffInHours($waktuMasuk);
+            
+            if ($selisihJam < $selisihJamMinimal) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Presensi pulang hanya bisa dilakukan minimal ' . $selisihJamMinimal . ' jam setelah presensi masuk!'
                 ]);
             }
             
