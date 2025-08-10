@@ -442,21 +442,21 @@ function showAlpaModal() {
     }
     
     const urls = [
-        // Try with correct base path first
+        // Try PUBLIC API routes FIRST (no auth required) - these are more reliable
+        `${basePath}/api/kepala-sekolah/siswa-alpa`,
+        `/api/kepala-sekolah/siswa-alpa`,
+        
+        // Then try authenticated routes as fallback
         `${basePath}/kepala-sekolah/siswa-alpa`,
         `${basePath}/kepala-sekolah/api/siswa-alpa`,
-        `${basePath}/api/kepala-sekolah/siswa-alpa`,
-        
-        // Fallback to root paths
         '/kepala-sekolah/siswa-alpa',
         '/kepala-sekolah/api/siswa-alpa',
-        '/api/kepala-sekolah/siswa-alpa',
         
-        // Try with full origin
-        window.location.origin + `${basePath}/kepala-sekolah/siswa-alpa`,
+        // Try with full origin as last resort
         window.location.origin + `${basePath}/api/kepala-sekolah/siswa-alpa`,
-        window.location.origin + '/kepala-sekolah/siswa-alpa',
-        window.location.origin + '/api/kepala-sekolah/siswa-alpa'
+        window.location.origin + `/api/kepala-sekolah/siswa-alpa`,
+        window.location.origin + `${basePath}/kepala-sekolah/siswa-alpa`,
+        window.location.origin + '/kepala-sekolah/siswa-alpa'
     ];
     
     console.log('Testing URLs for siswa-alpa:', urls);
@@ -566,21 +566,21 @@ function showSiswaByStatus(status) {
     }
     
     const urls = [
-        // Try with correct base path first
-        `${basePath}/kepala-sekolah/siswa-by-status/${status}`,
-        `${basePath}/kepala-sekolah/api/siswa-by-status/${status}`,
+        // Try PUBLIC API routes FIRST (no auth required) - these are more reliable
         `${basePath}/api/kepala-sekolah/siswa-by-status/${status}`,
-        
-        // Fallback to root paths
-        `/kepala-sekolah/siswa-by-status/${status}`,
-        `/kepala-sekolah/api/siswa-by-status/${status}`,
         `/api/kepala-sekolah/siswa-by-status/${status}`,
         
-        // Try with full origin
-        window.location.origin + `${basePath}/kepala-sekolah/siswa-by-status/${status}`,
+        // Then try authenticated routes as fallback
+        `${basePath}/kepala-sekolah/siswa-by-status/${status}`,
+        `${basePath}/kepala-sekolah/api/siswa-by-status/${status}`,
+        `/kepala-sekolah/siswa-by-status/${status}`,
+        `/kepala-sekolah/api/siswa-by-status/${status}`,
+        
+        // Try with full origin as last resort
         window.location.origin + `${basePath}/api/kepala-sekolah/siswa-by-status/${status}`,
-        window.location.origin + `/kepala-sekolah/siswa-by-status/${status}`,
-        window.location.origin + `/api/kepala-sekolah/siswa-by-status/${status}`
+        window.location.origin + `/api/kepala-sekolah/siswa-by-status/${status}`,
+        window.location.origin + `${basePath}/kepala-sekolah/siswa-by-status/${status}`,
+        window.location.origin + `/kepala-sekolah/siswa-by-status/${status}`
     ];
     
     console.log('Testing URLs for siswa-by-status:', urls);
@@ -625,7 +625,13 @@ function showSiswaByStatus(status) {
     
     fetchWithFallback()
         .then(data => {
-            console.log('Data received successfully:', data);
+            console.log('✅ Data received successfully:', data);
+            console.log('📊 Data type:', typeof data);
+            console.log('📊 Is array:', Array.isArray(data));
+            console.log('📊 Data length:', data ? data.length : 'null/undefined');
+            console.log('📊 First item sample:', data && data.length > 0 ? data[0] : 'no data');
+            console.log('🎯 Requested status:', status);
+            
             loading.classList.add('d-none');
             
             // Check if data has error property
@@ -634,6 +640,7 @@ function showSiswaByStatus(status) {
             }
             
             if (data && Array.isArray(data) && data.length > 0) {
+                console.log(`🎯 Showing ${data.length} students for status: ${status}`);
                 siswaList.classList.remove('d-none');
                 data.forEach((siswa, index) => {
                     const row = document.createElement('tr');
@@ -647,6 +654,7 @@ function showSiswaByStatus(status) {
                     tableBody.appendChild(row);
                 });
             } else {
+                console.log('📭 No data found, showing empty state');
                 emptyAlpa.classList.remove('d-none');
             }
         })
