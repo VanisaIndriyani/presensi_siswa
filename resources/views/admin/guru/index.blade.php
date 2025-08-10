@@ -124,7 +124,7 @@
                     <tr>
                         <th>No</th>
                         <th>Nama</th>
-                        <th>NIP</th>
+                                                        <th>NIP / NUPTK</th>
                         <th>Email</th>
                         <th>Jenis Kelamin</th>
                         <th>Status Akun</th>
@@ -189,7 +189,7 @@
           <input type="text" name="nama" class="form-control" required>
         </div>
         <div class="mb-3">
-          <label class="form-label">NIP</label>
+          <label class="form-label">NIP / NUPTK</label>
           <input type="text" name="nip" class="form-control" required>
         </div>
         <div class="mb-3">
@@ -237,7 +237,7 @@
           <input type="text" name="nama" id="edit-nama" class="form-control" required>
         </div>
         <div class="mb-3">
-          <label class="form-label">NIP</label>
+          <label class="form-label">NIP / NUPTK</label>
           <input type="text" name="nip" id="edit-nip" class="form-control" required>
         </div>
         <div class="mb-3">
@@ -277,7 +277,7 @@
       <div class="modal-body">
         <ul class="list-group mb-3">
           <li class="list-group-item"><b>Nama:</b> <span id="show-nama"></span></li>
-          <li class="list-group-item"><b>NIP:</b> <span id="show-nip"></span></li>
+          <li class="list-group-item"><b>NIP / NUPTK:</b> <span id="show-nip"></span></li>
           <li class="list-group-item"><b>Email:</b> <span id="show-email"></span></li>
           <li class="list-group-item"><b>Jenis Kelamin:</b> <span id="show-jenis_kelamin"></span></li>
           <li class="list-group-item"><b>Status Akun:</b> <span id="show-status-akun"></span></li>

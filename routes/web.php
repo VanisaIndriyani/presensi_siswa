@@ -74,6 +74,10 @@ Route::middleware(['auth', 'role:kepala_sekolah'])->prefix('kepala-sekolah')->na
     Route::get('laporan/export-pdf', [App\Http\Controllers\KepalaSekolah\LaporanController::class, 'exportPdf'])->name('laporan.exportPdf');
 });
 
+// Fallback API routes for Kepala Sekolah (to fix hosting issues)
+Route::get('/kepala-sekolah/api/siswa-alpa', [App\Http\Controllers\KepalaSekolah\DashboardController::class, 'getSiswaAlpa']);
+Route::get('/kepala-sekolah/api/siswa-by-status/{status}', [App\Http\Controllers\KepalaSekolah\DashboardController::class, 'getSiswaByStatus']);
+
 // Route QR code siswa (gambar PNG untuk modal show)
 Route::get('/admin/siswa/{siswa}/qrcode', function(App\Models\Siswa $siswa) {
     return \QrCode::format('png')->size(200)->generate($siswa->qr_code);

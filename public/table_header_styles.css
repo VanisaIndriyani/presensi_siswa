@@ -1,0 +1,65 @@
+/* 
+ * Table Header Styles - Konsisten untuk semua tabel di aplikasi
+ * File ini memastikan header tabel memiliki styling yang seragam
+ */
+
+/* Styling untuk header tabel - Background abu-abu muda, teks abu-abu gelap */
+.table thead th {
+    background: #f8f9fa !important; /* Light gray background */
+    color: #495057 !important; /* Dark gray text */
+    font-weight: 600;
+    border: 1px solid #dee2e6;
+    padding: 12px 8px;
+    text-align: center;
+    vertical-align: middle;
+    font-size: 0.9rem;
+}
+
+/* Styling untuk isi tabel - Teks abu-abu medium */
+.table tbody td {
+    color: #4B5563 !important; /* Abu-abu medium untuk isi tabel */
+    vertical-align: middle;
+    border: 1px solid #dee2e6;
+    padding: 12px 8px;
+}
+
+/* Hover effect untuk baris tabel */
+.table tbody tr:hover {
+    background-color: #f8f9fa;
+}
+
+/* Styling khusus untuk tabel dengan border */
+.table-bordered {
+    border: 1px solid #dee2e6;
+}
+
+.table-bordered th,
+.table-bordered td {
+    border: 1px solid #dee2e6;
+}
+
+/* Responsive table */
+@media (max-width: 768px) {
+    .table thead th {
+        padding: 8px 4px;
+        font-size: 0.8rem;
+    }
+    
+    .table tbody td {
+        padding: 8px 4px;
+        font-size: 0.8rem;
+    }
+}
+
+/* Print styles */
+@media print {
+    .table thead th {
+        background: #f8f9fa !important;
+        color: #000 !important;
+        border: 1px solid #000;
+    }
+    
+    .table tbody td {
+        border: 1px solid #000;
+    }
+}

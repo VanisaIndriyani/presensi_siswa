@@ -21,12 +21,12 @@ class GuruController extends Controller
         try {
             $validated = $request->validate([
                 'nama' => 'required|string|max:255',
-                'nip' => 'required|string|unique:gurus,nip|digits:18',
+                'nip' => 'required|string|unique:gurus,nip|digits_between:16,18',
                 'email' => 'required|email|unique:gurus,email|unique:users,email',
                 'jenis_kelamin' => 'nullable|in:Laki-laki,Perempuan',
                 'password' => 'required|min:6|max:255',
             ], [
-                'nip.digits' => 'NIP harus terdiri dari 18 digit angka.',
+                'nip.digits_between' => 'NIP / NUPTK harus terdiri dari 16-18 digit angka.',
                 'nip.unique' => 'NIP sudah terdaftar dalam sistem.',
                 'email.unique' => 'Email sudah digunakan.',
                 'email.email' => 'Format email tidak valid.',
@@ -93,14 +93,14 @@ class GuruController extends Controller
     {
         $validated = $request->validate([
             'nama' => 'required|string|max:255',
-            'nip' => 'required|string|unique:gurus,nip,' . $guru->id . '|digits:18',
+            'nip' => 'required|string|unique:gurus,nip,' . $guru->id . '|digits_between:16,18',
             'email' => 'required|email|unique:gurus,email,' . $guru->id,
             'mapel' => 'nullable|string|max:255',
             'jenis_kelamin' => 'nullable|in:Laki-laki,Perempuan',
             'alamat' => 'nullable|string|max:500',
             'password' => 'nullable|min:6|max:255',
         ], [
-            'nip.digits' => 'NIP harus terdiri dari 18 digit angka.',
+            'nip.digits_between' => 'NIP / NUPTK harus terdiri dari 16-18 digit angka.',
         ]);
 
         // Update data guru

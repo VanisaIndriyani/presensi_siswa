@@ -428,15 +428,63 @@ function showAlpaModal() {
     
     modal.show();
     
-    // Fetch data siswa yang alpa
-    fetch('/kepala-sekolah/siswa-alpa')
+    // Enhanced fallback URLs with better subfolder detection
+    const currentPath = window.location.pathname;
+    const isSubfolder = currentPath.includes('/presensi_siswa');
+    const basePath = isSubfolder ? '/presensi_siswa' : '';
+    
+    const urls = [
+        `${basePath}/kepala-sekolah/siswa-alpa`,
+        `${basePath}/kepala-sekolah/api/siswa-alpa`,
+        '/kepala-sekolah/siswa-alpa',
+        '/kepala-sekolah/api/siswa-alpa',
+        window.location.origin + '/kepala-sekolah/siswa-alpa',
+        window.location.origin + '/kepala-sekolah/api/siswa-alpa'
+    ];
+    
+    console.log('Testing URLs for siswa-alpa:', urls);
+    
+    let currentUrlIndex = 0;
+    
+    function tryFetch(url) {
+        console.log(`Trying URL ${currentUrlIndex + 1}:`, url);
+        return fetch(url, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            credentials: 'same-origin'
+        })
         .then(response => {
+            console.log(`URL ${currentUrlIndex + 1} response:`, response.status, response.statusText);
             if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
             }
             return response.json();
-        })
+        });
+    }
+    
+    function fetchWithFallback() {
+        if (currentUrlIndex >= urls.length) {
+            throw new Error('Semua URL gagal diakses. Periksa konfigurasi hosting dan console untuk detail error.');
+        }
+        
+        return tryFetch(urls[currentUrlIndex])
+            .catch(error => {
+                console.error(`URL ${urls[currentUrlIndex]} gagal:`, error.message);
+                currentUrlIndex++;
+                if (currentUrlIndex < urls.length) {
+                    console.log(`Mencoba URL berikutnya: ${urls[currentUrlIndex]}`);
+                    return fetchWithFallback();
+                }
+                throw error;
+            });
+    }
+    
+    fetchWithFallback()
         .then(data => {
+            console.log('Data received successfully:', data);
             loading.classList.add('d-none');
             
             // Check if data has error property
@@ -444,7 +492,7 @@ function showAlpaModal() {
                 throw new Error(data.error);
             }
             
-            if (data.length > 0) {
+            if (data && Array.isArray(data) && data.length > 0) {
                 siswaList.classList.remove('d-none');
                 data.forEach((siswa, index) => {
                     const row = document.createElement('tr');
@@ -464,7 +512,10 @@ function showAlpaModal() {
         .catch(error => {
             console.error('Error fetching siswa alpa:', error);
             loading.classList.add('d-none');
-            alert('Gagal memuat data siswa yang alpa: ' + error.message);
+            
+            // Show detailed error message
+            const errorMessage = `Gagal memuat data siswa yang alpa:\n\n${error.message}\n\nSilakan:\n1. Periksa console browser (F12)\n2. Coba refresh halaman\n3. Hubungi admin jika masalah berlanjut`;
+            alert(errorMessage);
         });
 }
 
@@ -484,15 +535,63 @@ function showSiswaByStatus(status) {
 
     modal.show();
 
-    // Fetch data siswa berdasarkan status
-    fetch(`/kepala-sekolah/siswa-by-status/${status}`)
+    // Enhanced fallback URLs with better subfolder detection
+    const currentPath = window.location.pathname;
+    const isSubfolder = currentPath.includes('/presensi_siswa');
+    const basePath = isSubfolder ? '/presensi_siswa' : '';
+    
+    const urls = [
+        `${basePath}/kepala-sekolah/siswa-by-status/${status}`,
+        `${basePath}/kepala-sekolah/api/siswa-by-status/${status}`,
+        `/kepala-sekolah/siswa-by-status/${status}`,
+        `/kepala-sekolah/api/siswa-by-status/${status}`,
+        window.location.origin + `/kepala-sekolah/siswa-by-status/${status}`,
+        window.location.origin + `/kepala-sekolah/api/siswa-by-status/${status}`
+    ];
+    
+    console.log('Testing URLs for siswa-by-status:', urls);
+    
+    let currentUrlIndex = 0;
+    
+    function tryFetch(url) {
+        console.log(`Trying URL ${currentUrlIndex + 1}:`, url);
+        return fetch(url, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            credentials: 'same-origin'
+        })
         .then(response => {
+            console.log(`URL ${currentUrlIndex + 1} response:`, response.status, response.statusText);
             if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
             }
             return response.json();
-        })
+        });
+    }
+    
+    function fetchWithFallback() {
+        if (currentUrlIndex >= urls.length) {
+            throw new Error('Semua URL gagal diakses. Periksa konfigurasi hosting dan console untuk detail error.');
+        }
+        
+        return tryFetch(urls[currentUrlIndex])
+            .catch(error => {
+                console.error(`URL ${urls[currentUrlIndex]} gagal:`, error.message);
+                currentUrlIndex++;
+                if (currentUrlIndex < urls.length) {
+                    console.log(`Mencoba URL berikutnya: ${urls[currentUrlIndex]}`);
+                    return fetchWithFallback();
+                }
+                throw error;
+            });
+    }
+    
+    fetchWithFallback()
         .then(data => {
+            console.log('Data received successfully:', data);
             loading.classList.add('d-none');
             
             // Check if data has error property
@@ -500,7 +599,7 @@ function showSiswaByStatus(status) {
                 throw new Error(data.error);
             }
             
-            if (data.length > 0) {
+            if (data && Array.isArray(data) && data.length > 0) {
                 siswaList.classList.remove('d-none');
                 data.forEach((siswa, index) => {
                     const row = document.createElement('tr');
@@ -520,7 +619,10 @@ function showSiswaByStatus(status) {
         .catch(error => {
             console.error('Error fetching siswa by status:', error);
             loading.classList.add('d-none');
-            alert('Gagal memuat data siswa berdasarkan status: ' + error.message);
+            
+            // Show detailed error message
+            const errorMessage = `Gagal memuat data siswa berdasarkan status:\n\n${error.message}\n\nSilakan:\n1. Periksa console browser (F12)\n2. Coba refresh halaman\n3. Hubungi admin jika masalah berlanjut`;
+            alert(errorMessage);
         });
 }
 
@@ -532,6 +634,30 @@ setTimeout(() => {
         bell.style.opacity = '0.7';
     }
 }, 10000);
+
+// Add debugging information to the page
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('Kepala Sekolah Dashboard loaded');
+    console.log('Current URL:', window.location.href);
+    console.log('Current pathname:', window.location.pathname);
+    console.log('Origin:', window.location.origin);
+    
+    // Check if we're in a subfolder
+    if (window.location.pathname.includes('/presensi_siswa')) {
+        console.log('⚠️ Detected subfolder hosting: presensi_siswa');
+        console.log('This might cause routing issues. Using fallback URLs.');
+    }
+    
+    // Add click event listeners to all clickable panels for debugging
+    const clickablePanels = document.querySelectorAll('[onclick*="showAlpaModal"], [onclick*="showSiswaByStatus"]');
+    clickablePanels.forEach(panel => {
+        console.log('Clickable panel found:', panel);
+        panel.addEventListener('click', function(e) {
+            console.log('Panel clicked:', this);
+            console.log('Click event:', e);
+        });
+    });
+});
 </script>
 @endpush
 @endsection
