@@ -428,30 +428,35 @@ function showAlpaModal() {
     
     modal.show();
     
-    // Enhanced fallback URLs with better subfolder detection and public API
+    // Fixed subfolder detection - check current URL path
+    const currentUrl = window.location.href;
     const currentPath = window.location.pathname;
-    const isSubfolder = currentPath.includes('/presensi_siswa');
-    const basePath = isSubfolder ? '/presensi_siswa' : '';
+    
+    // More accurate subfolder detection
+    let basePath = '';
+    if (currentUrl.includes('/presensi_siswa/') || currentPath.includes('/presensi_siswa')) {
+        basePath = '/presensi_siswa';
+        console.log('✅ Detected subfolder hosting, using basePath:', basePath);
+    } else {
+        console.log('✅ No subfolder detected, using root path');
+    }
     
     const urls = [
-        // Try authenticated routes first
+        // Try with correct base path first
         `${basePath}/kepala-sekolah/siswa-alpa`,
         `${basePath}/kepala-sekolah/api/siswa-alpa`,
+        `${basePath}/api/kepala-sekolah/siswa-alpa`,
+        
+        // Fallback to root paths
         '/kepala-sekolah/siswa-alpa',
         '/kepala-sekolah/api/siswa-alpa',
-        
-        // Try public API routes (no auth required)
-        `${basePath}/api/kepala-sekolah/siswa-alpa`,
         '/api/kepala-sekolah/siswa-alpa',
         
         // Try with full origin
+        window.location.origin + `${basePath}/kepala-sekolah/siswa-alpa`,
+        window.location.origin + `${basePath}/api/kepala-sekolah/siswa-alpa`,
         window.location.origin + '/kepala-sekolah/siswa-alpa',
-        window.location.origin + '/kepala-sekolah/api/siswa-alpa',
-        window.location.origin + '/api/kepala-sekolah/siswa-alpa',
-        
-        // Try with current domain
-        window.location.protocol + '//' + window.location.host + '/kepala-sekolah/siswa-alpa',
-        window.location.protocol + '//' + window.location.host + '/api/kepala-sekolah/siswa-alpa'
+        window.location.origin + '/api/kepala-sekolah/siswa-alpa'
     ];
     
     console.log('Testing URLs for siswa-alpa:', urls);
@@ -547,30 +552,35 @@ function showSiswaByStatus(status) {
 
     modal.show();
 
-    // Enhanced fallback URLs with better subfolder detection and public API
+    // Fixed subfolder detection - check current URL path
+    const currentUrl = window.location.href;
     const currentPath = window.location.pathname;
-    const isSubfolder = currentPath.includes('/presensi_siswa');
-    const basePath = isSubfolder ? '/presensi_siswa' : '';
+    
+    // More accurate subfolder detection
+    let basePath = '';
+    if (currentUrl.includes('/presensi_siswa/') || currentPath.includes('/presensi_siswa')) {
+        basePath = '/presensi_siswa';
+        console.log('✅ Detected subfolder hosting, using basePath:', basePath);
+    } else {
+        console.log('✅ No subfolder detected, using root path');
+    }
     
     const urls = [
-        // Try authenticated routes first
+        // Try with correct base path first
         `${basePath}/kepala-sekolah/siswa-by-status/${status}`,
         `${basePath}/kepala-sekolah/api/siswa-by-status/${status}`,
+        `${basePath}/api/kepala-sekolah/siswa-by-status/${status}`,
+        
+        // Fallback to root paths
         `/kepala-sekolah/siswa-by-status/${status}`,
         `/kepala-sekolah/api/siswa-by-status/${status}`,
-        
-        // Try public API routes (no auth required)
-        `${basePath}/api/kepala-sekolah/siswa-by-status/${status}`,
         `/api/kepala-sekolah/siswa-by-status/${status}`,
         
         // Try with full origin
+        window.location.origin + `${basePath}/kepala-sekolah/siswa-by-status/${status}`,
+        window.location.origin + `${basePath}/api/kepala-sekolah/siswa-by-status/${status}`,
         window.location.origin + `/kepala-sekolah/siswa-by-status/${status}`,
-        window.location.origin + `/kepala-sekolah/api/siswa-by-status/${status}`,
-        window.location.origin + `/api/kepala-sekolah/siswa-by-status/${status}`,
-        
-        // Try with current domain
-        window.location.protocol + '//' + window.location.host + `/kepala-sekolah/siswa-by-status/${status}`,
-        window.location.protocol + '//' + window.location.host + `/api/kepala-sekolah/siswa-by-status/${status}`
+        window.location.origin + `/api/kepala-sekolah/siswa-by-status/${status}`
     ];
     
     console.log('Testing URLs for siswa-by-status:', urls);
@@ -661,26 +671,48 @@ setTimeout(() => {
 
 // Add debugging information to the page
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('Kepala Sekolah Dashboard loaded');
-    console.log('Current URL:', window.location.href);
-    console.log('Current pathname:', window.location.pathname);
-    console.log('Origin:', window.location.origin);
+    console.log('🚀 Kepala Sekolah Dashboard loaded');
+    console.log('📍 Current URL:', window.location.href);
+    console.log('📍 Current pathname:', window.location.pathname);
+    console.log('📍 Origin:', window.location.origin);
+    console.log('📍 Host:', window.location.host);
     
     // Check if we're in a subfolder
-    if (window.location.pathname.includes('/presensi_siswa')) {
-        console.log('⚠️ Detected subfolder hosting: presensi_siswa');
-        console.log('This might cause routing issues. Using fallback URLs.');
+    const currentUrl = window.location.href;
+    const currentPath = window.location.pathname;
+    
+    if (currentUrl.includes('/presensi_siswa/') || currentPath.includes('/presensi_siswa')) {
+        console.log('⚠️  Detected subfolder hosting: presensi_siswa');
+        console.log('✅ Base path will be: /presensi_siswa');
+        console.log('🔗 Example API URL: /presensi_siswa/api/kepala-sekolah/siswa-alpa');
+    } else {
+        console.log('✅ No subfolder detected, using root path');
+        console.log('🔗 Example API URL: /api/kepala-sekolah/siswa-alpa');
     }
     
     // Add click event listeners to all clickable panels for debugging
     const clickablePanels = document.querySelectorAll('[onclick*="showAlpaModal"], [onclick*="showSiswaByStatus"]');
     clickablePanels.forEach(panel => {
-        console.log('Clickable panel found:', panel);
+        console.log('🎯 Clickable panel found:', panel);
         panel.addEventListener('click', function(e) {
-            console.log('Panel clicked:', this);
-            console.log('Click event:', e);
+            console.log('🖱️  Panel clicked:', this);
+            console.log('🖱️  Click event:', e);
         });
     });
+    
+    // Test API endpoint availability
+    console.log('🧪 Testing API endpoint availability...');
+    const testUrl = currentUrl.includes('/presensi_siswa/') ? 
+        '/presensi_siswa/api/kepala-sekolah/siswa-alpa' : 
+        '/api/kepala-sekolah/siswa-alpa';
+    
+    fetch(testUrl, { method: 'HEAD' })
+        .then(response => {
+            console.log('✅ API endpoint available:', testUrl, 'Status:', response.status);
+        })
+        .catch(error => {
+            console.log('❌ API endpoint not available:', testUrl, 'Error:', error.message);
+        });
 });
 </script>
 @endpush
