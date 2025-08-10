@@ -12,6 +12,18 @@
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteRule ^(.*)$ /presensi_siswa/public/$1 [L]
+    
+    # Handle API routes for subfolder hosting
+    RewriteCond %{REQUEST_URI} ^/presensi_siswa/api/
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^presensi_siswa/api/(.*)$ /presensi_siswa/public/index.php [L,QSA]
+    
+    # Handle Kepala Sekolah API routes for subfolder hosting
+    RewriteCond %{REQUEST_URI} ^/presensi_siswa/kepala-sekolah/api/
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^presensi_siswa/kepala-sekolah/api/(.*)$ /presensi_siswa/public/index.php [L,QSA]
 </IfModule>
 
 # Security headers
@@ -30,4 +42,13 @@
 <FilesMatch "(composer\.json|composer\.lock|package\.json|package-lock\.json|\.env|\.gitignore|README\.md)$">
     Order allow,deny
     Deny from all
-</FilesMatch> 
+</FilesMatch>
+
+# Enable CORS for API endpoints
+<IfModule mod_headers.c>
+    <FilesMatch "\.(php)$">
+        Header set Access-Control-Allow-Origin "*"
+        Header set Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
+        Header set Access-Control-Allow-Headers "Content-Type, Authorization, X-Requested-With"
+    </FilesMatch>
+</IfModule> 

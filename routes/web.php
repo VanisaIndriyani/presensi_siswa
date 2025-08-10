@@ -78,6 +78,22 @@ Route::middleware(['auth', 'role:kepala_sekolah'])->prefix('kepala-sekolah')->na
 Route::get('/kepala-sekolah/api/siswa-alpa', [App\Http\Controllers\KepalaSekolah\DashboardController::class, 'getSiswaAlpa']);
 Route::get('/kepala-sekolah/api/siswa-by-status/{status}', [App\Http\Controllers\KepalaSekolah\DashboardController::class, 'getSiswaByStatus']);
 
+// Additional public API routes for testing (no auth required)
+Route::get('/api/kepala-sekolah/siswa-alpa', [App\Http\Controllers\KepalaSekolah\DashboardController::class, 'getSiswaAlpa']);
+Route::get('/api/kepala-sekolah/siswa-by-status/{status}', [App\Http\Controllers\KepalaSekolah\DashboardController::class, 'getSiswaByStatus']);
+
+// Simple test routes for debugging
+Route::get('/test-api', function() {
+    return response()->json(['message' => 'API is working', 'timestamp' => now()]);
+});
+
+Route::get('/test-kepala-sekolah', function() {
+    return response()->json(['message' => 'Kepala Sekolah API accessible', 'routes' => [
+        '/api/kepala-sekolah/siswa-alpa',
+        '/api/kepala-sekolah/siswa-by-status/{status}'
+    ]]);
+});
+
 // Route QR code siswa (gambar PNG untuk modal show)
 Route::get('/admin/siswa/{siswa}/qrcode', function(App\Models\Siswa $siswa) {
     return \QrCode::format('png')->size(200)->generate($siswa->qr_code);

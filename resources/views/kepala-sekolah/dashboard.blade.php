@@ -428,18 +428,30 @@ function showAlpaModal() {
     
     modal.show();
     
-    // Enhanced fallback URLs with better subfolder detection
+    // Enhanced fallback URLs with better subfolder detection and public API
     const currentPath = window.location.pathname;
     const isSubfolder = currentPath.includes('/presensi_siswa');
     const basePath = isSubfolder ? '/presensi_siswa' : '';
     
     const urls = [
+        // Try authenticated routes first
         `${basePath}/kepala-sekolah/siswa-alpa`,
         `${basePath}/kepala-sekolah/api/siswa-alpa`,
         '/kepala-sekolah/siswa-alpa',
         '/kepala-sekolah/api/siswa-alpa',
+        
+        // Try public API routes (no auth required)
+        `${basePath}/api/kepala-sekolah/siswa-alpa`,
+        '/api/kepala-sekolah/siswa-alpa',
+        
+        // Try with full origin
         window.location.origin + '/kepala-sekolah/siswa-alpa',
-        window.location.origin + '/kepala-sekolah/api/siswa-alpa'
+        window.location.origin + '/kepala-sekolah/api/siswa-alpa',
+        window.location.origin + '/api/kepala-sekolah/siswa-alpa',
+        
+        // Try with current domain
+        window.location.protocol + '//' + window.location.host + '/kepala-sekolah/siswa-alpa',
+        window.location.protocol + '//' + window.location.host + '/api/kepala-sekolah/siswa-alpa'
     ];
     
     console.log('Testing URLs for siswa-alpa:', urls);
@@ -535,18 +547,30 @@ function showSiswaByStatus(status) {
 
     modal.show();
 
-    // Enhanced fallback URLs with better subfolder detection
+    // Enhanced fallback URLs with better subfolder detection and public API
     const currentPath = window.location.pathname;
     const isSubfolder = currentPath.includes('/presensi_siswa');
     const basePath = isSubfolder ? '/presensi_siswa' : '';
     
     const urls = [
+        // Try authenticated routes first
         `${basePath}/kepala-sekolah/siswa-by-status/${status}`,
         `${basePath}/kepala-sekolah/api/siswa-by-status/${status}`,
         `/kepala-sekolah/siswa-by-status/${status}`,
         `/kepala-sekolah/api/siswa-by-status/${status}`,
+        
+        // Try public API routes (no auth required)
+        `${basePath}/api/kepala-sekolah/siswa-by-status/${status}`,
+        `/api/kepala-sekolah/siswa-by-status/${status}`,
+        
+        // Try with full origin
         window.location.origin + `/kepala-sekolah/siswa-by-status/${status}`,
-        window.location.origin + `/kepala-sekolah/api/siswa-by-status/${status}`
+        window.location.origin + `/kepala-sekolah/api/siswa-by-status/${status}`,
+        window.location.origin + `/api/kepala-sekolah/siswa-by-status/${status}`,
+        
+        // Try with current domain
+        window.location.protocol + '//' + window.location.host + `/kepala-sekolah/siswa-by-status/${status}`,
+        window.location.protocol + '//' + window.location.host + `/api/kepala-sekolah/siswa-by-status/${status}`
     ];
     
     console.log('Testing URLs for siswa-by-status:', urls);
