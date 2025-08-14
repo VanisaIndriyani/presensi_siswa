@@ -45,10 +45,10 @@
         font-weight: 700;
     }
     .table thead th {
-        background: #f8f9fa !important; /* Light gray background */
-        color: #495057 !important; /* Dark gray text */
+        background: #007bff !important; /* Blue background */
+        color: #ffffff !important; /* White text */
         font-weight: 600;
-        border: 1px solid #dee2e6;
+        border: 1px solid #0056b3;
         padding: 12px 8px;
         text-align: center;
         vertical-align: middle;

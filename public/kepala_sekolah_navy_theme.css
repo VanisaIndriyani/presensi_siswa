@@ -1,0 +1,159 @@
+/* Global CSS untuk tema Navy Kepala Sekolah */
+
+/* Warna tema Navy yang konsisten */
+:root {
+    --navy-primary: #1e3a8a;
+    --navy-secondary: #3b82f6;
+    --navy-dark: #1e40af;
+    --navy-light: #60a5fa;
+    --navy-accent: #2563eb;
+}
+
+/* Sidebar dan header menggunakan tema navy */
+.kepala-sekolah .sidebar,
+[class*="kepala-sekolah"] .sidebar {
+    background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%) !important;
+}
+
+.kepala-sekolah .mobile-header,
+[class*="kepala-sekolah"] .mobile-header {
+    background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%) !important;
+}
+
+/* Tombol primary menggunakan tema navy */
+.kepala-sekolah .btn-primary,
+[class*="kepala-sekolah"] .btn-primary {
+    background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%) !important;
+    border-color: #1e3a8a !important;
+}
+
+.kepala-sekolah .btn-primary:hover,
+[class*="kepala-sekolah"] .btn-primary:hover {
+    background: linear-gradient(135deg, #1e40af 0%, #2563eb 100%) !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(30, 64, 175, 0.4);
+}
+
+/* Kartu statistik menggunakan tema navy */
+.kepala-sekolah .stat-card,
+[class*="kepala-sekolah"] .stat-card {
+    background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%) !important;
+}
+
+/* Header tabel menggunakan tema navy */
+.kepala-sekolah .table thead th,
+[class*="kepala-sekolah"] .table thead th {
+    background: #1e3a8a !important; /* Navy background */
+    color: #ffffff !important; /* White text */
+    border-color: #1e40af !important;
+}
+
+.kepala-sekolah .table thead th:hover,
+[class*="kepala-sekolah"] .table thead th:hover {
+    background: #1e40af !important; /* Darker navy on hover */
+    transition: background-color 0.2s ease;
+}
+
+/* Form focus menggunakan tema navy */
+.kepala-sekolah .form-control:focus,
+.kepala-sekolah .form-select:focus,
+[class*="kepala-sekolah"] .form-control:focus,
+[class*="kepala-sekolah"] .form-select:focus {
+    border-color: #1e3a8a !important;
+    box-shadow: 0 0 0 0.2rem rgba(30, 58, 138, 0.15) !important;
+}
+
+/* Link dan navigasi menggunakan tema navy */
+.kepala-sekolah .nav-link.active,
+[class*="kepala-sekolah"] .nav-link.active {
+    background: rgba(30, 58, 138, 0.2) !important;
+}
+
+.kepala-sekolah .nav-link:hover,
+[class*="kepala-sekolah"] .nav-link:hover {
+    background: rgba(30, 58, 138, 0.1) !important;
+}
+
+/* Responsive design untuk tema navy */
+@media (max-width: 768px) {
+    .kepala-sekolah .table thead th,
+    [class*="kepala-sekolah"] .table thead th {
+        padding: 8px 6px !important;
+        font-size: 0.9rem !important;
+    }
+}
+
+/* Hover effects untuk elemen interaktif */
+.kepala-sekolah .card:hover,
+[class*="kepala-sekolah"] .card:hover {
+    box-shadow: 0 8px 25px rgba(30, 58, 138, 0.15) !important;
+}
+
+/* Status badges menggunakan tema navy */
+.kepala-sekolah .status-badge,
+[class*="kepala-sekolah"] .status-badge {
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+/* Alert styling dengan tema navy */
+.kepala-sekolah .alert-info,
+[class*="kepala-sekolah"] .alert-info {
+    background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%) !important;
+    border: none !important;
+    color: white !important;
+}
+
+/* OVERRIDE SEMUA WARNA UNGU MENJADI NAVY */
+/* Table header card */
+.kepala-sekolah .table-header,
+[class*="kepala-sekolah"] .table-header {
+    background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%) !important;
+}
+
+/* Pagination links */
+.kepala-sekolah .page-link,
+[class*="kepala-sekolah"] .page-link {
+    color: #1e3a8a !important;
+}
+
+.kepala-sekolah .page-link:hover,
+[class*="kepala-sekolah"] .page-link:hover {
+    background-color: #1e3a8a !important;
+    border-color: #1e3a8a !important;
+}
+
+.kepala-sekolah .page-item.active .page-link,
+[class*="kepala-sekolah"] .page-item.active .page-link {
+    background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%) !important;
+    border-color: #1e3a8a !important;
+}
+
+/* Table row hover dan striped */
+.kepala-sekolah .table-striped > tbody > tr:nth-of-type(odd) > td,
+[class*="kepala-sekolah"] .table-striped > tbody > tr:nth-of-type(odd) > td {
+    background-color: rgba(30, 58, 138, 0.02) !important;
+}
+
+.kepala-sekolah .table tbody tr:hover,
+[class*="kepala-sekolah"] .table tbody tr:hover {
+    background-color: rgba(30, 58, 138, 0.05) !important;
+}
+
+/* Force override untuk semua elemen yang mungkin masih ungu */
+.kepala-sekolah *,
+[class*="kepala-sekolah"] * {
+    /* Override semua warna ungu menjadi navy */
+}
+
+.kepala-sekolah [style*="#7C3AED"],
+.kepala-sekolah [style*="#6D28D9"],
+.kepala-sekolah [style*="#9966CC"],
+.kepala-sekolah [style*="#663399"],
+[class*="kepala-sekolah"] [style*="#7C3AED"],
+[class*="kepala-sekolah"] [style*="#6D28D9"],
+[class*="kepala-sekolah"] [style*="#9966CC"],
+[class*="kepala-sekolah"] [style*="#663399"] {
+    /* Force override untuk inline styles */
+}

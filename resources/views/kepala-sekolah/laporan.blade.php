@@ -4,12 +4,12 @@
 
 <style>
     .page-header {
-        background: linear-gradient(135deg, #9966CC 0%, #663399 100%);
+        background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
         color: white;
         padding: 2rem;
         border-radius: 16px;
         margin-bottom: 2rem;
-        box-shadow: 0 8px 32px rgba(153, 102, 204, 0.3);
+        box-shadow: 0 8px 32px rgba(30, 58, 138, 0.3);
     }
     
     .page-title {
@@ -76,12 +76,12 @@
     }
     
     .form-control:focus, .form-select:focus {
-        border-color: #9966CC;
-        box-shadow: 0 0 0 0.2rem rgba(153, 102, 204, 0.15);
+        border-color: #1e3a8a;
+        box-shadow: 0 0 0 0.2rem rgba(30, 58, 138, 0.15);
     }
     
     .btn-primary {
-        background: linear-gradient(135deg, #9966CC 0%, #663399 100%);
+        background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
         border: none;
         border-radius: 12px;
         padding: 0.75rem 1.5rem;
@@ -91,7 +91,7 @@
     
     .btn-primary:hover {
         transform: translateY(-2px);
-        box-shadow: 0 4px 16px rgba(153, 102, 204, 0.4);
+        box-shadow: 0 4px 16px rgba(30, 58, 138, 0.4);
     }
     
     .btn-secondary {
@@ -117,7 +117,7 @@
     }
     
     .table-header {
-        background: linear-gradient(135deg, #9966CC 0%, #663399 100%);
+        background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
         color: white;
         padding: 1.5rem;
         border-bottom: none;
@@ -130,10 +130,10 @@
     }
     
     .table thead th {
-        background: #f8f9fa !important; /* Light gray background */
-        color: #495057 !important; /* Dark gray text */
+        background: #1e3a8a !important; /* Navy background */
+        color: #ffffff !important; /* White text */
         font-weight: 600;
-        border: 1px solid #dee2e6;
+        border: 1px solid #1e40af;
         padding: 1rem 0.75rem;
         font-size: 0.9rem;
     }
@@ -145,11 +145,11 @@
     }
     
     .table-striped > tbody > tr:nth-of-type(odd) > td {
-        background-color: rgba(153, 102, 204, 0.02);
+        background-color: rgba(30, 58, 138, 0.02);
     }
     
     .table tbody tr:hover {
-        background-color: rgba(153, 102, 204, 0.05);
+        background-color: rgba(30, 58, 138, 0.05);
     }
     
     .badge {
@@ -222,19 +222,19 @@
         border-radius: 8px;
         margin: 0 2px;
         border: 1px solid #dee2e6;
-        color: #9966CC;
+        color: #1e3a8a;
         font-weight: 500;
     }
     
     .page-link:hover {
-        background-color: #9966CC;
-        border-color: #9966CC;
+        background-color: #1e3a8a;
+        border-color: #1e3a8a;
         color: white;
     }
     
     .page-item.active .page-link {
-        background: linear-gradient(135deg, #9966CC 0%, #663399 100%);
-        border-color: #9966CC;
+        background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+        border-color: #1e3a8a;
     }
     
     @media (max-width: 768px) {

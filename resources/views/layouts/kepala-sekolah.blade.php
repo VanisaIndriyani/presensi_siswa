@@ -6,11 +6,12 @@
     <title>@yield('title', 'Dashboard Kepala Sekolah') - Sistem Presensi</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="{{ asset('kepala_sekolah_navy_theme.css') }}" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         .sidebar {
             min-height: 100vh;
-            background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%);
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
             position: fixed;
             top: 0;
             left: 0;
@@ -94,7 +95,7 @@
         
         .mobile-header {
             display: none;
-            background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%);
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
             color: white;
             padding: 1rem;
             position: sticky;
@@ -194,7 +195,7 @@
         }
         
         .stat-card {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
             color: white;
             border-radius: 15px;
             padding: 1.5rem;
@@ -213,7 +214,7 @@
         }
         
         .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
             border: none;
             border-radius: 8px;
             padding: 0.5rem 1rem;
@@ -222,7 +223,7 @@
         
         .btn-primary:hover {
             transform: translateY(-1px);
-            box-shadow: 0 4px 8px rgba(30, 64, 175, 0.3);
+            box-shadow: 0 4px 8px rgba(30, 64, 175, 0.4);
         }
         
         .navbar-brand {
@@ -297,7 +298,7 @@
         }
     </style>
 </head>
-<body>
+<body class="kepala-sekolah">
     <!-- Sidebar Overlay -->
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
     
@@ -322,7 +323,7 @@
     <!-- Sidebar -->
     <div class="sidebar p-3" id="sidebar">
         <div class="text-center mb-4">
-            <img src="{{ asset('img/logo.png') }}" alt="Logo" style="width:56px; height:56px; object-fit:contain; border-radius:12px; margin-bottom:10px; background:rgba(255,255,255,0.7); border:2px solid #fff; box-shadow:0 2px 8px rgba(102,126,234,0.10);">
+            <img src="{{ asset('img/logo.png') }}" alt="Logo" style="width:56px; height:56px; object-fit:contain; border-radius:12px; margin-bottom:10px; background:rgba(255,255,255,0.7); border:2px solid #fff; box-shadow:0 2px 8px rgba(30,58,138,0.15);">
             <h5 class="text-white mb-0">Sistem Presensi</h5>
             <small class="text-white-50">{{ auth()->user()->name }}</small>
         </div>

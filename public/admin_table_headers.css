@@ -1,0 +1,39 @@
+/* Global CSS untuk header tabel admin - Warna Biru Konsisten */
+
+/* Header tabel untuk semua halaman admin */
+.admin .table thead th,
+.admin .table thead th,
+[class*="admin"] .table thead th {
+    background: #007bff !important; /* Blue background */
+    color: #ffffff !important; /* White text */
+    font-weight: 600 !important;
+    border: 1px solid #0056b3 !important;
+    padding: 12px 8px !important;
+    text-align: center !important;
+    vertical-align: middle !important;
+}
+
+/* Hover effect untuk header tabel */
+.admin .table thead th:hover,
+[class*="admin"] .table thead th:hover {
+    background: #0056b3 !important; /* Darker blue on hover */
+    transition: background-color 0.2s ease;
+}
+
+/* Responsive table headers */
+@media (max-width: 768px) {
+    .admin .table thead th,
+    [class*="admin"] .table thead th {
+        padding: 8px 6px !important;
+        font-size: 0.9rem !important;
+    }
+}
+
+/* Ensure consistency across all admin pages */
+.admin .table thead th,
+.admin .table thead th,
+[class*="admin"] .table thead th {
+    background: #007bff !important;
+    color: #ffffff !important;
+    border-color: #0056b3 !important;
+}
