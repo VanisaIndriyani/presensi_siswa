@@ -113,7 +113,19 @@
             color: #a0aec0;
             font-size: 1.1rem;
             transition: color 0.3s ease;
+        }
+
+        .input-group .toggle-password {
+            position: absolute;
+            right: 15px;
+            left: auto;
             cursor: pointer;
+            color: #a0aec0;
+            transition: color 0.3s ease;
+        }
+
+        .input-group .toggle-password:hover {
+            color: #667eea;
         }
 
         .form-control {
@@ -247,9 +259,10 @@
             <div class="form-group">
                 <label for="password">Password Baru</label>
                 <div class="input-group">
+                    <i class="fas fa-lock"></i>
                     <input type="password" id="password" name="password" 
                            class="form-control" required placeholder="Masukkan password baru">
-                    <i class="fas fa-lock" onclick="togglePassword('password')"></i>
+                    <i class="fas fa-eye toggle-password" onclick="togglePassword('password')"></i>
                 </div>
                 <div class="password-strength" id="password-strength"></div>
             </div>
@@ -257,9 +270,10 @@
             <div class="form-group">
                 <label for="password_confirmation">Konfirmasi Password</label>
                 <div class="input-group">
+                    <i class="fas fa-lock"></i>
                     <input type="password" id="password_confirmation" name="password_confirmation" 
                            class="form-control" required placeholder="Konfirmasi password baru">
-                    <i class="fas fa-lock" onclick="togglePassword('password_confirmation')"></i>
+                    <i class="fas fa-eye toggle-password" onclick="togglePassword('password_confirmation')"></i>
                 </div>
             </div>
 
@@ -276,12 +290,12 @@
             
             if (input.type === 'password') {
                 input.type = 'text';
-                icon.classList.remove('fa-lock');
-                icon.classList.add('fa-lock-open');
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
             } else {
                 input.type = 'password';
-                icon.classList.remove('fa-lock-open');
-                icon.classList.add('fa-lock');
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
             }
         }
 

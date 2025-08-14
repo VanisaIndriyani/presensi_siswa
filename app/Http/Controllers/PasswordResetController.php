@@ -49,7 +49,11 @@ class PasswordResetController extends Controller
 
         // Kirim email
         try {
-            Mail::send('emails.reset-password', ['token' => $token, 'user' => $user], function($message) use($request){
+            Mail::send('emails.reset-password', [
+                'token' => $token, 
+                'user' => $user,
+                'resetUrl' => config('app.url') . '/reset-password/' . $token
+            ], function($message) use($request){
                 $message->to($request->email);
                 $message->subject('Reset Password - Sistem Presensi Siswa');
             });

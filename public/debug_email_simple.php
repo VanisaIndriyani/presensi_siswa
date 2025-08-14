@@ -1,5 +1,5 @@
 <?php
-// Debug file untuk masalah email reset password di LOCAL environment
+// Debug file sederhana untuk masalah email reset password di LOCAL environment
 header('Content-Type: text/html; charset=utf-8');
 
 // Load Laravel environment
@@ -129,7 +129,7 @@ if (file_exists($logFile)) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Debug Email Local - Reset Password</title>
+    <title>Debug Email Simple - Reset Password</title>
     <style>
         body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }
         .container { max-width: 1200px; margin: 0 auto; }
@@ -218,7 +218,7 @@ if (file_exists($logFile)) {
 </head>
 <body>
     <div class="container">
-        <h1>🔧 Debug Email Local - Reset Password</h1>
+        <h1>🔧 Debug Email Simple - Reset Password</h1>
         <p><strong>Environment:</strong> Local Development (localhost)</p>
         <p><strong>Masalah:</strong> Email reset password tidak masuk ke Gmail di local environment</p>
         

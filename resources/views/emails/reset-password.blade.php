@@ -152,7 +152,7 @@
             </div>
             
             <div style="text-align: center;">
-                <a href="{{ url('/reset-password/' . $token) }}" class="reset-button">
+                <a href="{{ $resetUrl }}" class="reset-button">
                     <i class="fas fa-key me-2"></i>Reset Password
                 </a>
             </div>
@@ -171,7 +171,7 @@
             </div>
             
             <div style="background: #f7fafc; padding: 15px; border-radius: 8px; word-break: break-all; font-family: monospace; font-size: 0.9rem; color: #4a5568;">
-                {{ url('/reset-password/' . $token) }}
+                {{ $resetUrl }}
             </div>
         </div>
         
