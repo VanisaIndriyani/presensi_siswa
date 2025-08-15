@@ -22,7 +22,7 @@ class GuruSeeder extends Seeder
             // Buat user account untuk guru
             $user = User::create([
                 'name' => 'Guru Utama',
-                'email' => 'vanisaindryani29@gmail.com',
+                'email' => 'kt6581387@gmail.com',
                 'password' => Hash::make('guru123'),
                 'role' => 'guru',
                 'email_verified_at' => now(),
